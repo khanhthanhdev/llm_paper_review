@@ -1,0 +1,10 @@
+[project]
+name = "arxiv2025-assessing-paper-novelty"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "grobid-client-python>=0.0.17",
+    "mineru[core]>=2.5.4",
+]
