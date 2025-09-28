@@ -29,15 +29,72 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Try to import RankGPT, fall back to simple ranking if not available
+def setup_rankgpt():
+    """
+    Automatically setup RankGPT by cloning from GitHub if not available locally.
+    Returns the path to RankGPT directory.
+    """
+    import subprocess
+    import tempfile
+    from pathlib import Path
+    
+    # Try common locations first (using portable paths)
+    possible_paths = [
+        Path.cwd() / "RankGPT",  # Current working directory
+        Path.cwd().parent / "RankGPT",  # Parent directory
+        Path(__file__).parent / "RankGPT",  # Same directory as this file
+        Path(__file__).parent.parent / "RankGPT",  # One level up from src/retrieval
+        Path(__file__).parent.parent.parent / "RankGPT",  # Project root level
+        Path.home() / ".cache" / "llm_paper_review" / "RankGPT",  # User cache directory
+        Path("/tmp") / "llm_paper_review" / "RankGPT"  # Temporary directory fallback
+    ]
+    
+    # Check if RankGPT exists in any of these locations
+    for path in possible_paths:
+        rankgpt_path = Path(path)
+        if rankgpt_path.exists() and (rankgpt_path / "rank_gpt.py").exists():
+            logger.info(f"Found existing RankGPT at: {rankgpt_path}")
+            return str(rankgpt_path)
+    
+    # If not found, clone from GitHub
+    try:
+        cache_dir = Path.home() / ".cache" / "llm_paper_review"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        rankgpt_path = cache_dir / "RankGPT"
+        
+        if not rankgpt_path.exists():
+            logger.info("RankGPT not found locally. Cloning from GitHub...")
+            subprocess.run([
+                "git", "clone", 
+                "https://github.com/sunnweiwei/RankGPT.git",
+                str(rankgpt_path)
+            ], check=True, capture_output=True, text=True)
+            logger.info(f"Successfully cloned RankGPT to: {rankgpt_path}")
+        
+        return str(rankgpt_path)
+        
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to clone RankGPT: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error setting up RankGPT: {e}")
+        return None
+
 try:
-    sys.path.append("/home/afzal/novelty_assessment/RankGPT")
-    from rank_gpt import (
-        create_permutation_instruction,
-        run_llm,
-        receive_permutation,
-        sliding_windows,
-    )
-    RANKGPT_AVAILABLE = True
+    rankgpt_path = setup_rankgpt()
+    if rankgpt_path:
+        sys.path.insert(0, rankgpt_path)
+        from rank_gpt import (
+            create_permutation_instruction,
+            run_llm,
+            receive_permutation,
+            sliding_windows,
+        )
+        RANKGPT_AVAILABLE = True
+        logger.info("RankGPT successfully imported and available")
+    else:
+        raise ImportError("Could not setup RankGPT")
+        
 except ImportError:
     logger.warning("RankGPT not available, using fallback ranking method")
     RANKGPT_AVAILABLE = False

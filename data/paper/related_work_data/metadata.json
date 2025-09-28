@@ -1,0 +1,25 @@
+{
+  "submission_id": "paper",
+  "queries_used": [
+    "sequence learning",
+    "end-to-end approach",
+    "LSTM translation",
+    "BLEU score improvement"
+  ],
+  "total_cost": 0.0016075,
+  "num_cited_papers": 29,
+  "num_query_papers": 80,
+  "num_final_ranked": 15,
+  "num_all_retrieved": 97,
+  "pdf_download": {
+    "total_papers": 15,
+    "pdfs_downloaded": 11,
+    "download_success_rate": 73.33333333333333,
+    "download_timestamp": "2025-09-28 05:13:34",
+    "stats": {
+      "downloaded": 11,
+      "failed": 2,
+      "not_found": 2
+    }
+  }
+}

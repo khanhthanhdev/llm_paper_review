@@ -29,8 +29,9 @@ logger = logging.getLogger(__name__)
 class MinerUOCRClient:
     """Client for interacting with MinerU FastAPI server."""
     
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(self, base_url: str = "http://localhost:8000", timeout: int = 3600):
         self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
         self.session = requests.Session()
         
         # Test connection
@@ -71,7 +72,7 @@ class MinerUOCRClient:
                     response = self.session.post(
                         f"{self.base_url}/file_parse",
                         files=files,
-                        timeout=300  # 5 minute timeout for OCR processing
+                        timeout=3600 # 60 minute timeout for OCR processing
                     )
                 
                 if response.status_code == 200:

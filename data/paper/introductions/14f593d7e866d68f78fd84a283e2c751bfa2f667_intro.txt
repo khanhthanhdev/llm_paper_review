@@ -1,0 +1,18 @@
+End-to-end speech translation (E2E ST) represents a paradigm shift from cascaded speech translation by utilizing a direct model for converting source language speech into target-language text. This approach offers advantages such as low latency and avoiding the "error propagation" issue often encountered in traditional cascade methods (Weiss et al., 2017; Sperber and Paulik, 2020). In recent times, end-to-end speech translation (ST) models have demonstrated noteworthy progress, achieving comparable or, in some instances, superior results when compared to traditional cascaded ST models (Bentivogli et al., 2021; Anastasopoulos et al., 2021, 2022).
+
+Despite these benefits, E2E ST models face challenges when compared to the cascaded methods (Di Gangi et al., 2019), as there are robust training data available for automatic speech recognition (ASR) and machine translation (MT) which can be employed in cascade methods. The relatively limited training data for E2E ST models may lead to sub-optimal performance in certain scenarios. Prior research endeavors frequently tap into machine translation (MT) data to enhance training by applying multi-task learning techniques, as observed in works by Ye et al. (2022); Tang et al. (2021). Here the encoder and decoder are shared between speech translation (ST) and machine translation (MT) and the model acquires similar representations from distinct modalities.
+
+![](images/9cbdfed33a55036902e17aaa3c0641631d72dd34d095c94d49dd7f5c7e2357d1.jpg)  
+Figure 1: Pipeline of our noisy data creation.
+
+Another research direction can be automatically creating large-scale mined corpus (Duquenne et al., 2023). However, the created data is often too noisy mostly because it is too hard to align data in two different languages. On top of that, for Speech Translation we have to also align between two different modalities. Then the research focus falls on filtering the noisy data. This work focuses on filtering Speech Translation data and observing if by doing so the systems’ performance can be improved.
+
+Our main contributions in a nutshell:
+
+• We try different filtering methods for Speech Translation.   
+• We show that the simplest ratio-based filtering can effectively differentiate clean data from noisy data.   
+• We show that a somewhat good ST model trained by a small clean data can efficiently filter a noisy corpus and thus improve the models’ performance.
+
+Table 1: WER score of the ASR systems used to transcribe the SpeechMatrix dataset. The multilingual model uses FR, ES, PT, and IT languages. The monolingual models outperform the multilingual models.   
+
+<table><tr><td>Language</td><td>Model</td><td>WER↓</td><td>Dataset</td></tr><tr><td rowspan="3">English (EN)</td><td>(Di Gangi et al., 2019)</td><td>25.81</td><td rowspan="3">MuST-C</td></tr><tr><td>Monolingual</td><td>14.26</td></tr><tr><td>Multilingual</td><td>-</td></tr><tr><td rowspan="3">French (FR)</td><td>(Salesky et al., 2021)</td><td>45.6</td><td rowspan="3">MTedX</td></tr><tr><td>Monolingual</td><td>19.2</td></tr><tr><td>Multilingual</td><td>22.24</td></tr><tr><td rowspan="3">Spanish (ES)</td><td>(Salesky et al., 2021)</td><td>46.4</td><td rowspan="3">MTedX</td></tr><tr><td>Monolingual</td><td>17.06</td></tr><tr><td>Multilingual</td><td>18.17</td></tr><tr><td rowspan="3">Portuguese (PT)</td><td>(Salesky et al., 2021)</td><td>54.8</td><td rowspan="3">MTedX</td></tr><tr><td>Monolingual</td><td>22.86</td></tr><tr><td>Multilingual</td><td>24.48</td></tr><tr><td rowspan="3">Italian (IT)</td><td>(Salesky et al., 2021)</td><td>48.0</td><td rowspan="3">MTedX</td></tr><tr><td>Monolingual</td><td>-</td></tr><tr><td>Multilingual</td><td>21.37</td></tr></table>

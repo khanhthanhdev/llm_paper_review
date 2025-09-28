@@ -33,4 +33,3 @@ acl-anthology>=0.2.0
 
 mineru[core]
 
-rank_gpt

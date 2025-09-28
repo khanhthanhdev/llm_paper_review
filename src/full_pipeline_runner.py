@@ -116,7 +116,7 @@ def run_grobid(pdf_path: Path, output_path: Path, grobid_url: str, force: bool) 
     try:
         with pdf_path.open("rb") as handle:
             files = {"input": (pdf_path.name, handle, "application/pdf")}
-            response = requests.post(endpoint, files=files, data=data, timeout=300)
+            response = requests.post(endpoint, files=files, data=data, timeout=3600)
         response.raise_for_status()
     except requests.RequestException as exc:
         raise RuntimeError(f"GROBID request failed: {exc}") from exc
@@ -246,13 +246,10 @@ def build_steps(
 
 
 def run_steps(steps: list[Step]) -> None:
-    """Execute each step sequentially, respecting skip checks."""
+    """Execute each step sequentially, ignoring skip checks to run full pipeline."""
 
     for step in steps:
-        if step.should_skip():
-            LOGGER.info("Skipping step: %s", step.name)
-            continue
-
+        # Always run every step - no skipping
         LOGGER.info("Starting step: %s", step.name)
         try:
             step.action()

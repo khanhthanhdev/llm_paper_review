@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main" xml:id="_ScVsyfJ">Sequence to Sequence Learning with Neural Networks</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability  status="unknown">
+					<licence/>
+				</availability>
+				<date type="published" when="2014-12-14">14 Dec 2014</date>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Ilya</forename><surname>Sutskever</surname></persName>
+							<email>ilyasu@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Oriol</forename><surname>Vinyals</surname></persName>
+							<email>vinyals@google.com</email>
+						</author>
+						<author>
+							<persName><forename type="first">Quoc</forename><forename type="middle">V</forename><surname>Le</surname></persName>
+						</author>
+						<title level="a" type="main" xml:id="_dtvMpuA">Sequence to Sequence Learning with Neural Networks</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date type="published" when="2014-12-14">14 Dec 2014</date>
+						</imprint>
+					</monogr>
+					<idno type="MD5">4C74116A86BF750934AB2FB5154A2CF7</idno>
+					<idno type="arXiv">arXiv:1409.3215v3[cs.CL]</idno>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.8.2" ident="GROBID" when="2025-09-28T05:10+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<label type="revision">a91ee48</label>
+					<label type="parameters">startPage=-1, endPage=-1, consolidateCitations=0, consolidateHeader=0, consolidateFunders=0, includeRawAffiliations=false, includeRawCitations=false, includeRawCopyrights=false, generateTeiIds=true, generateTeiCoordinates=[], sentenceSegmentation=false, flavor=null</label>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<abstract>
+<div xmlns="http://www.tei-c.org/ns/1.0" xml:id="_hMHcfkS"><p xml:id="_x2amAjU">Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks. Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences. In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure. Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector of a fixed dimensionality, and then another deep LSTM to decode the target sequence from the vector. Our main result is that on an English to French translation task from the WMT'14 dataset, the translations produced by the LSTM achieve a BLEU score of 34.8 on the entire test set, where the LSTM's BLEU score was penalized on out-of-vocabulary words. Additionally, the LSTM did not have difficulty on long sentences. For comparison, a phrase-based SMT system achieves a BLEU score of 33.3 on the same dataset. When we used the LSTM to rerank the 1000 hypotheses produced by the aforementioned SMT system, its BLEU score increases to 36.5, which is close to the previous best result on this task. The LSTM also learned sensible phrase and sentence representations that are sensitive to word order and are relatively invariant to the active and the passive voice. Finally, we found that reversing the order of the words in all source sentences (but not target sentences) improved the LSTM's performance markedly, because doing so introduced many short term dependencies between the source and the target sentence which made the optimization problem easier.</p></div>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="1" xml:id="_M4rUYSg">Introduction</head><p xml:id="_Vr7ZfEv">Deep Neural Networks (DNNs) are extremely powerful machine learning models that achieve excellent performance on difficult problems such as speech recognition <ref type="bibr" target="#b12">[13,</ref><ref type="bibr" target="#b6">7]</ref> and visual object recognition <ref type="bibr" target="#b18">[19,</ref><ref type="bibr" target="#b5">6,</ref><ref type="bibr" target="#b20">21,</ref><ref type="bibr" target="#b19">20]</ref>. DNNs are powerful because they can perform arbitrary parallel computation for a modest number of steps. A surprising example of the power of DNNs is their ability to sort N N -bit numbers using only 2 hidden layers of quadratic size <ref type="bibr" target="#b26">[27]</ref>. So, while neural networks are related to conventional statistical models, they learn an intricate computation. Furthermore, large DNNs can be trained with supervised backpropagation whenever the labeled training set has enough information to specify the network's parameters. Thus, if there exists a parameter setting of a large DNN that achieves good results (for example, because humans can solve the task very rapidly), supervised backpropagation will find these parameters and solve the problem.</p><p xml:id="_cDYPJhT">Despite their flexibility and power, DNNs can only be applied to problems whose inputs and targets can be sensibly encoded with vectors of fixed dimensionality. It is a significant limitation, since many important problems are best expressed with sequences whose lengths are not known a-priori. For example, speech recognition and machine translation are sequential problems. Likewise, question answering can also be seen as mapping a sequence of words representing the question to a sequence of words representing the answer. It is therefore clear that a domain-independent method that learns to map sequences to sequences would be useful.</p><p xml:id="_ShttFmC">Sequences pose a challenge for DNNs because they require that the dimensionality of the inputs and outputs is known and fixed. In this paper, we show that a straightforward application of the Long Short-Term Memory (LSTM) architecture <ref type="bibr" target="#b15">[16]</ref> can solve general sequence to sequence problems. The idea is to use one LSTM to read the input sequence, one timestep at a time, to obtain large fixeddimensional vector representation, and then to use another LSTM to extract the output sequence from that vector (fig. <ref type="figure">1</ref>). The second LSTM is essentially a recurrent neural network language model <ref type="bibr" target="#b27">[28,</ref><ref type="bibr" target="#b22">23,</ref><ref type="bibr" target="#b29">30]</ref> except that it is conditioned on the input sequence. The LSTM's ability to successfully learn on data with long range temporal dependencies makes it a natural choice for this application due to the considerable time lag between the inputs and their corresponding outputs (fig. <ref type="figure">1</ref>).</p><p xml:id="_G3AE7s4">There have been a number of related attempts to address the general sequence to sequence learning problem with neural networks. Our approach is closely related to Kalchbrenner and Blunsom <ref type="bibr" target="#b17">[18]</ref> who were the first to map the entire input sentence to vector, and is related to Cho et al. <ref type="bibr" target="#b4">[5]</ref> although the latter was used only for rescoring hypotheses produced by a phrase-based system. Graves <ref type="bibr" target="#b9">[10]</ref> introduced a novel differentiable attention mechanism that allows neural networks to focus on different parts of their input, and an elegant variant of this idea was successfully applied to machine translation by Bahdanau et al. <ref type="bibr" target="#b1">[2]</ref>. The Connectionist Sequence Classification is another popular technique for mapping sequences to sequences with neural networks, but it assumes a monotonic alignment between the inputs and the outputs <ref type="bibr" target="#b10">[11]</ref>.</p><p xml:id="_zJvukE7">Figure <ref type="figure">1</ref>: Our model reads an input sentence "ABC" and produces "WXYZ" as the output sentence. The model stops making predictions after outputting the end-of-sentence token. Note that the LSTM reads the input sentence in reverse, because doing so introduces many short term dependencies in the data that make the optimization problem much easier.</p><p xml:id="_RawVrBe">The main result of this work is the following. On the WMT'14 English to French translation task, we obtained a BLEU score of 34.81 by directly extracting translations from an ensemble of 5 deep LSTMs (with 384M parameters and 8,000 dimensional state each) using a simple left-to-right beamsearch decoder. This is by far the best result achieved by direct translation with large neural networks. For comparison, the BLEU score of an SMT baseline on this dataset is 33.30 <ref type="bibr" target="#b28">[29]</ref>. The 34.81 BLEU score was achieved by an LSTM with a vocabulary of 80k words, so the score was penalized whenever the reference translation contained a word not covered by these 80k. This result shows that a relatively unoptimized small-vocabulary neural network architecture which has much room for improvement outperforms a phrase-based SMT system. Finally, we used the LSTM to rescore the publicly available 1000-best lists of the SMT baseline on the same task <ref type="bibr" target="#b28">[29]</ref>. By doing so, we obtained a BLEU score of 36.5, which improves the baseline by 3.2 BLEU points and is close to the previous best published result on this task (which is 37.0 <ref type="bibr" target="#b8">[9]</ref>). Surprisingly, the LSTM did not suffer on very long sentences, despite the recent experience of other researchers with related architectures <ref type="bibr" target="#b25">[26]</ref>. We were able to do well on long sentences because we reversed the order of words in the source sentence but not the target sentences in the training and test set. By doing so, we introduced many short term dependencies that made the optimization problem much simpler (see sec. 2 and 3.3). As a result, SGD could learn LSTMs that had no trouble with long sentences. The simple trick of reversing the words in the source sentence is one of the key technical contributions of this work.</p><p xml:id="_ZdNGxAx">A useful property of the LSTM is that it learns to map an input sentence of variable length into a fixed-dimensional vector representation. Given that translations tend to be paraphrases of the source sentences, the translation objective encourages the LSTM to find sentence representations that capture their meaning, as sentences with similar meanings are close to each other while different sentences meanings will be far. A qualitative evaluation supports this claim, showing that our model is aware of word order and is fairly invariant to the active and passive voice.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="2" xml:id="_JFK5eUt">The model</head><p xml:id="_cwBeFES">The Recurrent Neural Network (RNN) <ref type="bibr" target="#b30">[31,</ref><ref type="bibr" target="#b27">28]</ref> is a natural generalization of feedforward neural networks to sequences. Given a sequence of inputs (x 1 , . . . , x T ), a standard RNN computes a sequence of outputs (y 1 , . . . , y T ) by iterating the following equation:</p><formula xml:id="formula_0">h t = sigm W hx x t + W hh h t-1 y t = W yh h t</formula><p xml:id="_skeWXRK">The RNN can easily map sequences to sequences whenever the alignment between the inputs the outputs is known ahead of time. However, it is not clear how to apply an RNN to problems whose input and the output sequences have different lengths with complicated and non-monotonic relationships.</p><p xml:id="_Kd6xNQM">The simplest strategy for general sequence learning is to map the input sequence to a fixed-sized vector using one RNN, and then to map the vector to the target sequence with another RNN (this approach has also been taken by Cho et al. <ref type="bibr" target="#b4">[5]</ref>). While it could work in principle since the RNN is provided with all the relevant information, it would be difficult to train the RNNs due to the resulting long term dependencies (figure <ref type="figure">1</ref>) <ref type="bibr" target="#b13">[14,</ref><ref type="bibr" target="#b3">4,</ref><ref type="bibr" target="#b15">16,</ref><ref type="bibr" target="#b14">15]</ref>. However, the Long Short-Term Memory (LSTM) <ref type="bibr" target="#b15">[16]</ref> is known to learn problems with long range temporal dependencies, so an LSTM may succeed in this setting.</p><p xml:id="_vWjfKCW">The goal of the LSTM is to estimate the conditional probability p(y 1 , . . . , y T ′ |x 1 , . . . , x T ) where (x 1 , . . . , x T ) is an input sequence and y 1 , . . . , y T ′ is its corresponding output sequence whose length T ′ may differ from T . The LSTM computes this conditional probability by first obtaining the fixeddimensional representation v of the input sequence (x 1 , . . . , x T ) given by the last hidden state of the LSTM, and then computing the probability of y 1 , . . . , y T ′ with a standard LSTM-LM formulation whose initial hidden state is set to the representation v of x 1 , . . . , x T :</p><formula xml:id="formula_1">p(y 1 , . . . , y T ′ |x 1 , . . . , x T ) = T ′ t=1 p(y t |v, y 1 , . . . , y t-1 )<label>(1)</label></formula><p xml:id="_bR7FW8s">In this equation, each p(y t |v, y 1 , . . . , y t-1 ) distribution is represented with a softmax over all the words in the vocabulary. We use the LSTM formulation from Graves <ref type="bibr" target="#b9">[10]</ref>. Note that we require that each sentence ends with a special end-of-sentence symbol "&lt;EOS&gt;", which enables the model to define a distribution over sequences of all possible lengths. The overall scheme is outlined in figure <ref type="figure">1</ref>, where the shown LSTM computes the representation of "A", "B", "C", "&lt;EOS&gt;" and then uses this representation to compute the probability of "W", "X", "Y", "Z", "&lt;EOS&gt;".</p><p xml:id="_6gf5Sz6">Our actual models differ from the above description in three important ways. First, we used two different LSTMs: one for the input sequence and another for the output sequence, because doing so increases the number model parameters at negligible computational cost and makes it natural to train the LSTM on multiple language pairs simultaneously <ref type="bibr" target="#b17">[18]</ref>. Second, we found that deep LSTMs significantly outperformed shallow LSTMs, so we chose an LSTM with four layers. Third, we found it extremely valuable to reverse the order of the words of the input sentence. So for example, instead of mapping the sentence a, b, c to the sentence α, β, γ, the LSTM is asked to map c, b, a to α, β, γ, where α, β, γ is the translation of a, b, c. This way, a is in close proximity to α, b is fairly close to β, and so on, a fact that makes it easy for SGD to "establish communication" between the input and the output. We found this simple data transformation to greatly improve the performance of the LSTM.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3" xml:id="_REHWdpy">Experiments</head><p xml:id="_xmBdPan">We applied our method to the WMT'14 English to French MT task in two ways. We used it to directly translate the input sentence without using a reference SMT system and we it to rescore the n-best lists of an SMT baseline. We report the accuracy of these translation methods, present sample translations, and visualize the resulting sentence representation.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.1" xml:id="_zZgjh5Y">Dataset details</head><p xml:id="_TP7m83y">We used the WMT'14 English to French dataset. We trained our models on a subset of 12M sentences consisting of 348M French words and 304M English words, which is a clean "selected" subset from <ref type="bibr" target="#b28">[29]</ref>. We chose this translation task and this specific training set subset because of the public availability of a tokenized training and test set together with 1000-best lists from the baseline SMT <ref type="bibr" target="#b28">[29]</ref>.</p><p xml:id="_hyFFbpe">As typical neural language models rely on a vector representation for each word, we used a fixed vocabulary for both languages. We used 160,000 of the most frequent words for the source language and 80,000 of the most frequent words for the target language. Every out-of-vocabulary word was replaced with a special "UNK" token.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.2" xml:id="_4t8Fqmz">Decoding and Rescoring</head><p xml:id="_cWaUsPW">The core of our experiments involved training a large deep LSTM on many sentence pairs. We trained it by maximizing the log probability of a correct translation T given the source sentence S, so the training objective is</p><formula xml:id="formula_2">1/|S| (T,S)∈S log p(T |S)</formula><p xml:id="_QCX5Qsw">where S is the training set. Once training is complete, we produce translations by finding the most likely translation according to the LSTM:</p><formula xml:id="formula_3">T = arg max T p(T |S)<label>(2)</label></formula><p xml:id="_TksDkaX">We search for the most likely translation using a simple left-to-right beam search decoder which maintains a small number B of partial hypotheses, where a partial hypothesis is a prefix of some translation. At each timestep we extend each partial hypothesis in the beam with every possible word in the vocabulary. This greatly increases the number of the hypotheses so we discard all but the B most likely hypotheses according to the model's log probability. As soon as the "&lt;EOS&gt;" symbol is appended to a hypothesis, it is removed from the beam and is added to the set of complete hypotheses. While this decoder is approximate, it is simple to implement. Interestingly, our system performs well even with a beam size of 1, and a beam of size 2 provides most of the benefits of beam search (Table <ref type="table" target="#tab_0">1</ref>).</p><p xml:id="_sCE8K88">We also used the LSTM to rescore the 1000-best lists produced by the baseline system <ref type="bibr" target="#b28">[29]</ref>. To rescore an n-best list, we computed the log probability of every hypothesis with our LSTM and took an even average with their score and the LSTM's score.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.3" xml:id="_TbkDtdw">Reversing the Source Sentences</head><p xml:id="_grz5w7u">While the LSTM is capable of solving problems with long term dependencies, we discovered that the LSTM learns much better when the source sentences are reversed (the target sentences are not reversed). By doing so, the LSTM's test perplexity dropped from 5.8 to 4.7, and the test BLEU scores of its decoded translations increased from 25.9 to 30.6.</p><p xml:id="_73SZ5sj">While we do not have a complete explanation to this phenomenon, we believe that it is caused by the introduction of many short term dependencies to the dataset. Normally, when we concatenate a source sentence with a target sentence, each word in the source sentence is far from its corresponding word in the target sentence. As a result, the problem has a large "minimal time lag" <ref type="bibr" target="#b16">[17]</ref>. By reversing the words in the source sentence, the average distance between corresponding words in the source and target language is unchanged. However, the first few words in the source language are now very close to the first few words in the target language, so the problem's minimal time lag is greatly reduced. Thus, backpropagation has an easier time "establishing communication" between the source sentence and the target sentence, which in turn results in substantially improved overall performance.</p><p xml:id="_VJZ4vkn">Initially, we believed that reversing the input sentences would only lead to more confident predictions in the early parts of the target sentence and to less confident predictions in the later parts. However, LSTMs trained on reversed source sentences did much better on long sentences than LSTMs trained on the raw source sentences (see sec. 3.7), which suggests that reversing the input sentences results in LSTMs with better memory utilization.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.4" xml:id="_xYfMkTm">Training details</head><p xml:id="_zKJrKD8">We found that the LSTM models are fairly easy to train. We used deep LSTMs with 4 layers, with 1000 cells at each layer and 1000 dimensional word embeddings, with an input vocabulary of 160,000 and an output vocabulary of 80,000. Thus the deep LSTM uses 8000 real numbers to represent a sentence. We found deep LSTMs to significantly outperform shallow LSTMs, where each additional layer reduced perplexity by nearly 10%, possibly due to their much larger hidden state. We used a naive softmax over 80,000 words at each output. The resulting LSTM has 384M parameters of which 64M are pure recurrent connections (32M for the "encoder" LSTM and 32M for the "decoder" LSTM). The complete training details are given below:</p><p xml:id="_FmRzmFj">• We initialized all of the LSTM's parameters with the uniform distribution between -0.08 and 0.08 • We used stochastic gradient descent without momentum, with a fixed learning rate of 0.7.</p><p xml:id="_P4K6ErN">After 5 epochs, we begun halving the learning rate every half epoch. We trained our models for a total of 7.5 epochs. • We used batches of 128 sequences for the gradient and divided it the size of the batch (namely, 128). • Although LSTMs tend to not suffer from the vanishing gradient problem, they can have exploding gradients. Thus we enforced a hard constraint on the norm of the gradient <ref type="bibr" target="#b9">[10,</ref><ref type="bibr" target="#b24">25]</ref> by scaling it when its norm exceeded a threshold. For each training batch, we compute s = g 2 , where g is the gradient divided by 128. If s &gt; 5, we set g = 5g s . • Different sentences have different lengths. Most sentences are short (e.g., length <ref type="bibr" target="#b19">[20]</ref><ref type="bibr" target="#b20">[21]</ref><ref type="bibr" target="#b21">[22]</ref><ref type="bibr" target="#b22">[23]</ref><ref type="bibr" target="#b23">[24]</ref><ref type="bibr" target="#b24">[25]</ref><ref type="bibr" target="#b25">[26]</ref><ref type="bibr" target="#b26">[27]</ref><ref type="bibr" target="#b27">[28]</ref><ref type="bibr" target="#b28">[29]</ref><ref type="bibr" target="#b29">[30]</ref> but some sentences are long (e.g., length &gt; 100), so a minibatch of 128 randomly chosen training sentences will have many short sentences and few long sentences, and as a result, much of the computation in the minibatch is wasted. To address this problem, we made sure that all sentences in a minibatch are roughly of the same length, yielding a 2x speedup.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.5" xml:id="_GxAYqjZ">Parallelization</head><p xml:id="_YNFFpK4">A C++ implementation of deep LSTM with the configuration from the previous section on a single GPU processes a speed of approximately 1,700 words per second. This was too slow for our purposes, so we parallelized our model using an 8-GPU machine. Each layer of the LSTM was executed on a different GPU and communicated its activations to the next GPU / layer as soon as they were computed. Our models have 4 layers of LSTMs, each of which resides on a separate GPU. The remaining 4 GPUs were used to parallelize the softmax, so each GPU was responsible for multiplying by a 1000 × 20000 matrix. The resulting implementation achieved a speed of 6,300 (both English and French) words per second with a minibatch size of 128. Training took about a ten days with this implementation.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.6" xml:id="_2C3wvrX">Experimental Results</head><p xml:id="_B5Je3jw">We used the cased BLEU score <ref type="bibr" target="#b23">[24]</ref> to evaluate the quality of our translations. We computed our BLEU scores using multi-bleu.pl<ref type="foot" target="#foot_0">foot_0</ref> on the tokenized predictions and ground truth. This way of evaluating the BELU score is consistent with <ref type="bibr" target="#b4">[5]</ref> and <ref type="bibr" target="#b1">[2]</ref>, and reproduces the 33.3 score of <ref type="bibr" target="#b28">[29]</ref>. However, if we evaluate the best WMT'14 system <ref type="bibr" target="#b8">[9]</ref> (whose predictions can be downloaded from statmt.org\matrix) in this manner, we get 37.0, which is greater than the 35.8 reported by statmt.org\matrix.</p><p xml:id="_nbrGzyq">The results are presented in tables 1 and 2. Our best results are obtained with an ensemble of LSTMs that differ in their random initializations and in the random order of minibatches. While the decoded translations of the LSTM ensemble do not outperform the best WMT'14 system, it is the first time that a pure neural translation system outperforms a phrase-based SMT baseline on a large scale MT </p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head xml:id="_NEgHrx2">Method test BLEU score (ntst14)</head><p xml:id="_WQBvg4F">Baseline System <ref type="bibr" target="#b28">[29]</ref> 33.30 Cho et al. <ref type="bibr" target="#b4">[5]</ref> 34.54 Best WMT'14 result <ref type="bibr" target="#b8">[9]</ref> 37.0 Rescoring the baseline 1000-best with a single forward LSTM 35.61 Rescoring the baseline 1000-best with a single reversed LSTM 35.85 Rescoring the baseline 1000-best with an ensemble of 5 reversed LSTMs 36.5 Oracle Rescoring of the Baseline 1000-best lists ∼45</p><p xml:id="_CUFgKKY">Table <ref type="table">2</ref>: Methods that use neural networks together with an SMT system on the WMT'14 English to French test set (ntst14).</p><p xml:id="_7udmAes">task by a sizeable margin, despite its inability to handle out-of-vocabulary words. The LSTM is within 0.5 BLEU points of the best WMT'14 result if it is used to rescore the 1000-best list of the baseline system.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.7" xml:id="_WdV6eyb">Performance on long sentences</head><p xml:id="_JXzKQMp">We were surprised to discover that the LSTM did well on long sentences, which is shown quantitatively in figure <ref type="figure">3</ref>. Table <ref type="table">3</ref> presents several examples of long sentences and their translations.  One of the attractive features of our model is its ability to turn a sequence of words into a vector of fixed dimensionality. Figure <ref type="figure" target="#fig_1">2</ref> visualizes some of the learned representations. The figure clearly shows that the representations are sensitive to the order of words, while being fairly insensitive to the</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.8" xml:id="_uZDjyAb">Model Analysis</head><p xml:id="_cEEgeeM">Type Sentence Our model Ulrich UNK , membre du conseil d' administration du constructeur automobile Audi , affirme qu' il s' agit d' une pratique courante depuis des années pour que les téléphones portables puissent être collectés avant les réunions du conseil d' administration afin qu' ils ne soient pas utilisés comme appareils d' écoute à distance . Truth Ulrich Hackenberg , membre du conseil d' administration du constructeur automobile Audi , déclare que la collecte des téléphones portables avant les réunions du conseil , afin qu' ils ne puissent pas être utilisés comme appareils d' écoute à distance , est une pratique courante depuis des années . Our model " Les téléphones cellulaires , qui sont vraiment une question , non seulement parce qu' ils pourraient potentiellement causer des interférences avec les appareils de navigation , mais nous savons , selon la FCC , qu' ils pourraient interférer avec les tours de téléphone cellulaire lorsqu' ils sont dans l' air " , dit UNK .</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head xml:id="_J9UZqvN">Truth</head><p xml:id="_vj8WHmH">" Les téléphones portables sont véritablement un problème , non seulement parce qu' ils pourraient éventuellement créer des interférences avec les instruments de navigation , mais parce que nous savons , d' après la FCC , qu' ils pourraient perturber les antennes-relais de téléphonie mobile s' ils sont utilisés à bord " , a déclaré Rosenker . Our model Avec la crémation , il y a un " sentiment de violence contre le corps d' un être cher " , qui sera " réduit à une pile de cendres " en très peu de temps au lieu d' un processus de décomposition " qui accompagnera les étapes du deuil " .</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head xml:id="_8nVQhN2">Truth</head><p xml:id="_RkEhmH5">Il y a , avec la crémation , " une violence faite au corps aimé " , qui va être " réduit à un tas de cendres " en très peu de temps , et non après un processus de décomposition , qui " accompagnerait les phases du deuil " .</p><p xml:id="_g5dW3n6">Table 3: A few examples of long translations produced by the LSTM alongside the ground truth translations. The reader can verify that the translations are sensible using Google translate.</p><p xml:id="_nFqDpBW">4 7 8 12 17 22 28 35 79 test sentences sorted by their length 20 25 30 35 40 BLEU score LSTM (34.8) baseline (33.3) 0 500 1000 1500 2000 2500 3000 3500 test sentences sorted by average word frequency rank 20 25 30 35 40 BLEU score LSTM (34.8) baseline (33.3)</p><p xml:id="_3GGF9uk">Figure <ref type="figure">3</ref>: The left plot shows the performance of our system as a function of sentence length, where the x-axis corresponds to the test sentences sorted by their length and is marked by the actual sequence lengths. There is no degradation on sentences with less than 35 words, there is only a minor degradation on the longest sentences. The right plot shows the LSTM's performance on sentences with progressively more rare words, where the x-axis corresponds to the test sentences sorted by their "average word frequency rank". replacement of an active voice with a passive voice. The two-dimensional projections are obtained using PCA.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4" xml:id="_N8BNcSs">Related work</head><p xml:id="_bh9MrTF">There is a large body of work on applications of neural networks to machine translation. So far, the simplest and most effective way of applying an RNN-Language Model (RNNLM) <ref type="bibr" target="#b22">[23]</ref> or a Feedforward Neural Network Language Model (NNLM) <ref type="bibr" target="#b2">[3]</ref> to an MT task is by rescoring the nbest lists of a strong MT baseline <ref type="bibr" target="#b21">[22]</ref>, which reliably improves translation quality.</p><p xml:id="_DZ226ff">More recently, researchers have begun to look into ways of including information about the source language into the NNLM. Examples of this work include Auli et al. <ref type="bibr" target="#b0">[1]</ref>, who combine an NNLM with a topic model of the input sentence, which improves rescoring performance. Devlin et al. <ref type="bibr" target="#b7">[8]</ref> followed a similar approach, but they incorporated their NNLM into the decoder of an MT system and used the decoder's alignment information to provide the NNLM with the most useful words in the input sentence. Their approach was highly successful and it achieved large improvements over their baseline.</p><p xml:id="_WthXFmK">Our work is closely related to Kalchbrenner and Blunsom <ref type="bibr" target="#b17">[18]</ref>, who were the first to map the input sentence into a vector and then back to a sentence, although they map sentences to vectors using convolutional neural networks, which lose the ordering of the words. Similarly to this work, Cho et al. <ref type="bibr" target="#b4">[5]</ref> used an LSTM-like RNN architecture to map sentences into vectors and back, although their primary focus was on integrating their neural network into an SMT system. Bahdanau et al. <ref type="bibr" target="#b1">[2]</ref> also attempted direct translations with a neural network that used an attention mechanism to overcome the poor performance on long sentences experienced by Cho et al. <ref type="bibr" target="#b4">[5]</ref> and achieved encouraging results. Likewise, Pouget-Abadie et al. <ref type="bibr" target="#b25">[26]</ref> attempted to address the memory problem of Cho et al. <ref type="bibr" target="#b4">[5]</ref> by translating pieces of the source sentence in way that produces smooth translations, which is similar to a phrase-based approach. We suspect that they could achieve similar improvements by simply training their networks on reversed source sentences.</p><p xml:id="_pFcgQzP">End-to-end training is also the focus of Hermann et al. <ref type="bibr" target="#b11">[12]</ref>, whose model represents the inputs and outputs by feedforward networks, and map them to similar points in space. However, their approach cannot generate translations directly: to get a translation, they need to do a look up for closest vector in the pre-computed database of sentences, or to rescore a sentence.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5" xml:id="_ZUtruGD">Conclusion</head><p xml:id="_jJx3mjK">In this work, we showed that a large deep LSTM, that has a limited vocabulary and that makes almost no assumption about problem structure can outperform a standard SMT-based system whose vocabulary is unlimited on a large-scale MT task. The success of our simple LSTM-based approach on MT suggests that it should do well on many other sequence learning problems, provided they have enough training data.</p><p xml:id="_mNshkMv">We were surprised by the extent of the improvement obtained by reversing the words in the source sentences. We conclude that it is important to find a problem encoding that has the greatest number of short term dependencies, as they make the learning problem much simpler. In particular, while we were unable to train a standard RNN on the non-reversed translation problem (shown in fig. <ref type="figure">1</ref>), we believe that a standard RNN should be easily trainable when the source sentences are reversed (although we did not verify it experimentally).</p><p xml:id="_ptHcXQX">We were also surprised by the ability of the LSTM to correctly translate very long sentences. We were initially convinced that the LSTM would fail on long sentences due to its limited memory, and other researchers reported poor performance on long sentences with a model similar to ours <ref type="bibr" target="#b4">[5,</ref><ref type="bibr" target="#b1">2,</ref><ref type="bibr" target="#b25">26]</ref>. And yet, LSTMs trained on the reversed dataset had little difficulty translating long sentences.</p><p xml:id="_cJDAynC">Most importantly, we demonstrated that a simple, straightforward and a relatively unoptimized approach can outperform an SMT system, so further work will likely lead to even greater translation accuracies. These results suggest that our approach will likely do well on other challenging sequence to sequence problems.</p></div><figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0"><figDesc xml:id="_Mxz9AF3">a card in the gardenIn the garden , I gave her a card She was given a card by me in the garden She gave me a card in the garden In the garden , she gave me a card I was given a card by her in the garden</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1"><head>Figure 2 :</head><label>2</label><figDesc xml:id="_nEwz69b">Figure 2: The figure shows a 2-dimensional PCA projection of the LSTM hidden states that are obtained after processing the phrases in the figures. The phrases are clustered by meaning, which in these examples is primarily a function of word order, which would be difficult to capture with a bag-of-words model. Notice that both clusters have similar internal structure.</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_0"><head>Table 1 :</head><label>1</label><figDesc xml:id="_dTcbM7x">The performance of the LSTM on WMT'14 English to French test set (ntst14). Note that an ensemble of 5 LSTMs with a beam of size 2 is cheaper than of a single LSTM with a beam of size 12.</figDesc><table><row><cell>Method</cell><cell>test BLEU score (ntst14)</cell></row><row><cell>Bahdanau et al. [2]</cell><cell>28.45</cell></row><row><cell>Baseline System [29]</cell><cell>33.30</cell></row><row><cell>Single forward LSTM, beam size 12</cell><cell>26.17</cell></row><row><cell>Single reversed LSTM, beam size 12</cell><cell>30.59</cell></row><row><cell>Ensemble of 5 reversed LSTMs, beam size 1</cell><cell>33.00</cell></row><row><cell>Ensemble of 2 reversed LSTMs, beam size 12</cell><cell>33.27</cell></row><row><cell>Ensemble of 5 reversed LSTMs, beam size 2</cell><cell>34.50</cell></row><row><cell>Ensemble of 5 reversed LSTMs, beam size 12</cell><cell>34.81</cell></row></table></figure>
+			<note xmlns="http://www.tei-c.org/ns/1.0" place="foot" n="1" xml:id="foot_0"><p xml:id="_T8Ar4HB">There several variants of the BLEU score, and each variant is defined with a perl script.</p></note>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div><head n="6" xml:id="_yaDatzQ">Acknowledgments</head><p xml:id="_5SdFxJy">We thank <rs type="person">Samy Bengio</rs>, <rs type="person">Jeff Dean</rs>, <rs type="person">Matthieu Devin</rs>, <rs type="person">Geoffrey Hinton</rs>, <rs type="person">Nal Kalchbrenner</rs>, <rs type="person">Thang Luong</rs>, <rs type="person">Wolfgang Macherey</rs>, <rs type="person">Rajat Monga</rs>, <rs type="person">Vincent Vanhoucke</rs>, <rs type="person">Peng Xu</rs>, <rs type="person">Wojciech Zaremba</rs>, and the <rs type="institution" subtype="infrastructure">Google Brain</rs> team for useful comments and discussions.</p></div>
+			</div>
+			<listOrg type="infrastructure">
+				<org type="infrastructure">					<orgName type="extracted">Google Brain</orgName>
+				</org>
+			</listOrg>
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<analytic>
+		<title level="a" type="main" xml:id="_EqSwadf">Joint language and translation modeling with recurrent neural networks</title>
+		<author>
+			<persName><forename type="first">M</forename><surname>Auli</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Galley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Quirk</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Zweig</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_Kb3Zx7k">EMNLP</title>
+		<imprint>
+			<date type="published" when="2013">2013</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<monogr>
+		<title level="m" type="main" xml:id="_HpsKVcY">Neural machine translation by jointly learning to align and translate</title>
+		<author>
+			<persName><forename type="first">D</forename><surname>Bahdanau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Cho</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1409.0473</idno>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<analytic>
+		<title level="a" type="main" xml:id="_dmNTkC7">A neural probabilistic language model</title>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Ducharme</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Vincent</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Jauvin</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_rtXFpC7">Journal of Machine Learning Research</title>
+		<imprint>
+			<biblScope unit="page" from="1137" to="1155" />
+			<date type="published" when="2003">2003</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main" xml:id="_b2P6bu6">Learning long-term dependencies with gradient descent is difficult</title>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Simard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Frasconi</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_CBpj5Zy">IEEE Transactions on Neural Networks</title>
+		<imprint>
+			<biblScope unit="volume">5</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="157" to="166" />
+			<date type="published" when="1994">1994</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<monogr>
+		<title level="m" type="main" xml:id="_5Be5JcA">Learning phrase representations using RNN encoder-decoder for statistical machine translation</title>
+		<author>
+			<persName><forename type="first">K</forename><surname>Cho</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Merrienboer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Gulcehre</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Bougares</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Schwenk</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1406.1078</idno>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">In Arxiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<analytic>
+		<title level="a" type="main" xml:id="_a6CQczV">Multi-column deep neural networks for image classification</title>
+		<author>
+			<persName><forename type="first">D</forename><surname>Ciresan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">U</forename><surname>Meier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Schmidhuber</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_wmF8JRS">CVPR</title>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main" xml:id="_mWtJry7">Context-dependent pre-trained deep neural networks for large vocabulary speech recognition</title>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">E</forename><surname>Dahl</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Deng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Acero</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_Vd2PcXE">IEEE Transactions on Audio, Speech, and Language Processing -Special Issue on Deep Learning for Speech and Language Processing</title>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<analytic>
+		<title level="a" type="main" xml:id="_6uwxjqc">Fast and robust neural network joint models for statistical machine translation</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Devlin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Zbib</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Z</forename><surname>Huang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Lamar</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Schwartz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Makhoul</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_Mhe2zbw">ACL</title>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<monogr>
+		<title level="m" type="main" xml:id="_N44A49j">Edinburgh&apos;s phrase-based machine translation systems for wmt-14</title>
+		<author>
+			<persName><forename type="first">Nadir</forename><surname>Durrani</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Barry</forename><surname>Haddow</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Philipp</forename><surname>Koehn</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kenneth</forename><surname>Heafield</surname></persName>
+		</author>
+		<editor>WMT</editor>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<monogr>
+		<title level="m" type="main" xml:id="_taHxjv6">Generating sequences with recurrent neural networks</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Graves</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1308.0850</idno>
+		<imprint>
+			<date type="published" when="2013">2013</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">In Arxiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<analytic>
+		<title level="a" type="main" xml:id="_UCMaymX">Connectionist temporal classification: labelling unsegmented sequence data with recurrent neural networks</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Graves</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Fernández</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Gomez</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Schmidhuber</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_RskFdEA">ICML</title>
+		<imprint>
+			<date type="published" when="2006">2006</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<title level="a" type="main" xml:id="_QmpVVeZ">Multilingual distributed representations without word alignment</title>
+		<author>
+			<persName><forename type="first">K</forename><forename type="middle">M</forename><surname>Hermann</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Blunsom</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_pNUrS5h">ICLR</title>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<analytic>
+		<title level="a" type="main" xml:id="_SBhhyqF">Deep neural networks for acoustic modeling in speech recognition</title>
+		<author>
+			<persName><forename type="first">G</forename><surname>Hinton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Deng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Dahl</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Mohamed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Jaitly</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Senior</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Vanhoucke</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Nguyen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Sainath</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Kingsbury</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_mYaZPy6">IEEE Signal Processing Magazine</title>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<monogr>
+		<title level="m" type="main" xml:id="_w27wAS2">Untersuchungen zu dynamischen neuronalen netzen. Master&apos;s thesis</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Hochreiter</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1991">1991</date>
+		</imprint>
+		<respStmt>
+			<orgName>Institut fur Informatik, Technische Universitat, Munchen</orgName>
+		</respStmt>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<monogr>
+		<title level="m" type="main" xml:id="_MXP5vF5">Gradient flow in recurrent nets: the difficulty of learning long-term dependencies</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Hochreiter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Frasconi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Schmidhuber</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2001">2001</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<analytic>
+		<title level="a" type="main" xml:id="_ZDhDmV9">Long short-term memory</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Hochreiter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Schmidhuber</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_9MNjSF6">Neural Computation</title>
+		<imprint>
+			<date type="published" when="1997">1997</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<monogr>
+		<title level="m" type="main" xml:id="_VJNd5FA">LSTM can solve hard long time lag problems</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Hochreiter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Schmidhuber</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1997">1997</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<analytic>
+		<title level="a" type="main" xml:id="_89DFrGj">Recurrent continuous translation models</title>
+		<author>
+			<persName><forename type="first">N</forename><surname>Kalchbrenner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Blunsom</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_qvzm3Rn">EMNLP</title>
+		<imprint>
+			<date type="published" when="2013">2013</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<analytic>
+		<title level="a" type="main" xml:id="_cz99CKz">ImageNet classification with deep convolutional neural networks</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Krizhevsky</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><surname>Sutskever</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">E</forename><surname>Hinton</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_6HjsW32">NIPS</title>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<analytic>
+		<title level="a" type="main" xml:id="_zu5sPYY">Building high-level features using large scale unsupervised learning</title>
+		<author>
+			<persName><forename type="first">Q</forename><forename type="middle">V</forename><surname>Le</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">A</forename><surname>Ranzato</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Monga</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Devin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">S</forename><surname>Corrado</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Dean</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">Y</forename><surname>Ng</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_ghwnz9W">ICML</title>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<analytic>
+		<title level="a" type="main" xml:id="_SaA6cPm">Gradient-based learning applied to document recognition</title>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Lecun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Bottou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Haffner</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_3SuEhZV">Proceedings of the IEEE</title>
+		<meeting>the IEEE</meeting>
+		<imprint>
+			<date type="published" when="1998">1998</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<monogr>
+		<title level="m" type="main" xml:id="_Xhewq75">Statistical Language Models based on Neural Networks</title>
+		<author>
+			<persName><forename type="first">T</forename><surname>Mikolov</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+		<respStmt>
+			<orgName>Brno University of Technology</orgName>
+		</respStmt>
+	</monogr>
+	<note type="report_type">PhD thesis</note>
+</biblStruct>
+
+<biblStruct xml:id="b22">
+	<analytic>
+		<title level="a" type="main" xml:id="_qcVjckc">Recurrent neural network based language model</title>
+		<author>
+			<persName><forename type="first">T</forename><surname>Mikolov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Karafiát</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Burget</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Cernockỳ</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Khudanpur</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_6sXpbW4">INTERSPEECH</title>
+		<imprint>
+			<date type="published" when="2010">2010</date>
+			<biblScope unit="page" from="1045" to="1048" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b23">
+	<analytic>
+		<title level="a" type="main" xml:id="_EHdhYjh">BLEU: a method for automatic evaluation of machine translation</title>
+		<author>
+			<persName><forename type="first">K</forename><surname>Papineni</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Roukos</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Ward</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><forename type="middle">J</forename><surname>Zhu</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_aPSHcRu">ACL</title>
+		<imprint>
+			<date type="published" when="2002">2002</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b24">
+	<monogr>
+		<title level="m" type="main" xml:id="_CVRgV2t">On the difficulty of training recurrent neural networks</title>
+		<author>
+			<persName><forename type="first">R</forename><surname>Pascanu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Mikolov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1211.5063</idno>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b25">
+	<monogr>
+		<title level="m" type="main" xml:id="_BRkA2xH">Overcoming the curse of sentence length for neural machine translation using automatic segmentation</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Pouget-Abadie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Bahdanau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Van Merrienboer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Cho</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Bengio</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1409.1257</idno>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b26">
+	<analytic>
+		<title level="a" type="main" xml:id="_nZ3YxHS">On small depth threshold circuits</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Razborov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_Th7qfe3">Proc. 3rd Scandinavian Workshop on Algorithm Theory</title>
+		<meeting>3rd Scandinavian Workshop on Algorithm Theory</meeting>
+		<imprint>
+			<date type="published" when="1992">1992</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b27">
+	<analytic>
+		<title level="a" type="main" xml:id="_sxgXyGN">Learning representations by back-propagating errors</title>
+		<author>
+			<persName><forename type="first">D</forename><surname>Rumelhart</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">E</forename><surname>Hinton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">J</forename><surname>Williams</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_NeTRqcB">Nature</title>
+		<imprint>
+			<biblScope unit="volume">323</biblScope>
+			<biblScope unit="issue">6088</biblScope>
+			<biblScope unit="page" from="533" to="536" />
+			<date type="published" when="1986">1986</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b28">
+	<monogr>
+		<author>
+			<persName><forename type="first">H</forename><surname>Schwenk</surname></persName>
+		</author>
+		<ptr target="http://www-lium.univ-lemans.fr/˜schwenk/cslm_joint_paper/" />
+		<title level="m" xml:id="_jRRXdMd">University le mans</title>
+		<imprint>
+			<date type="published" when="2014-09">2014. September-2014</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b29">
+	<analytic>
+		<title level="a" type="main" xml:id="_McmPUpd">LSTM neural networks for language modeling</title>
+		<author>
+			<persName><forename type="first">M</forename><surname>Sundermeyer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Schluter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Ney</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_hfJZFfr">INTER-SPEECH</title>
+		<imprint>
+			<date type="published" when="2010">2010</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b30">
+	<analytic>
+		<title level="a" type="main" xml:id="_7J43GsS">Backpropagation through time: what it does and how to do it</title>
+		<author>
+			<persName><forename type="first">P</forename><surname>Werbos</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_4EDFUdc">Proceedings of IEEE</title>
+		<meeting>IEEE</meeting>
+		<imprint>
+			<date type="published" when="1990">1990</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>
