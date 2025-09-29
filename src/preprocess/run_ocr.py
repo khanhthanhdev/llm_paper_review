@@ -26,6 +26,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+PRIMARY_PDF_MARKER = ".primary_pdf"
+
+
 class MinerUOCRClient:
     """Client for interacting with MinerU FastAPI server."""
     
@@ -144,6 +147,18 @@ class MinerUOCRClient:
 
 def find_main_paper_pdf(submission_dir: Path, submission_id: str) -> Optional[Path]:
     """Find the main paper PDF file."""
+    marker = submission_dir / PRIMARY_PDF_MARKER
+    if marker.exists():
+        try:
+            recorded_name = marker.read_text(encoding="utf-8").strip()
+        except OSError as exc:
+            logger.warning(f"Unable to read primary PDF marker {marker}: {exc}")
+        else:
+            if recorded_name:
+                recorded_path = submission_dir / recorded_name
+                if recorded_path.exists():
+                    return recorded_path
+
     # Try common locations/names for main paper
     candidates = [
         submission_dir / f"{submission_id}.pdf",

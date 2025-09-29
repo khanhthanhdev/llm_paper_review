@@ -4,7 +4,8 @@
 # Configured for the current environment
 
 # Configuration
-SUBMISSION_ID="paper"  # Change this to your submission ID
+# Leave SUBMISSION_ID empty to automatically generate one from the PDF name + timestamp
+SUBMISSION_ID=""
 PDF_PATH="/workspace/llm_paper_review/seq2seq.pdf"
 DATA_DIR="data"
 GROBID_URL="http://localhost:8070"
@@ -12,14 +13,6 @@ MINERU_URL="http://localhost:8000"  # Update if MinerU runs on different port
 MODEL="gpt-4o"  # Updated to use available OpenAI model
 TEMPERATURE="0.0"
 OCR_WORKERS="4"  # Increased for faster processing - adjust based on your system
-
-echo "Starting Novelty Assessment Pipeline..."
-echo "Submission ID: $SUBMISSION_ID"
-echo "PDF: $PDF_PATH"
-echo "Data Directory: $DATA_DIR"
-echo "GROBID URL: $GROBID_URL"
-echo "MinerU URL: $MINERU_URL"
-echo ""
 
 # Check prerequisites
 echo "Checking prerequisites..."
@@ -40,6 +33,26 @@ else
     echo "✗ PDF not found at $PDF_PATH"
     exit 1
 fi
+
+# Auto-generate a submission ID when not provided
+if [ -z "$SUBMISSION_ID" ]; then
+    pdf_filename=$(basename -- "$PDF_PATH")
+    pdf_stem="${pdf_filename%.*}"
+    pdf_stem=$(echo "$pdf_stem" | tr '[:upper:]' '[:lower:]')
+    sanitized=$(echo "$pdf_stem" | tr -c 'a-z0-9' '-')
+    sanitized=$(echo "$sanitized" | sed -E 's/-+/-/g' | sed -E 's/^-+|-+$//g')
+    timestamp=$(date +"%Y%m%d-%H%M%S")
+    SUBMISSION_ID="${sanitized:-submission}-${timestamp}"
+fi
+
+echo ""
+echo "Starting Novelty Assessment Pipeline..."
+echo "Submission ID: $SUBMISSION_ID"
+echo "PDF: $PDF_PATH"
+echo "Data Directory: $DATA_DIR"
+echo "GROBID URL: $GROBID_URL"
+echo "MinerU URL: $MINERU_URL"
+echo ""
 
 
 

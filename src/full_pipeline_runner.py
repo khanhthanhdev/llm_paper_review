@@ -42,6 +42,38 @@ from novelty_assessment.pipeline import NoveltyAssessmentPipeline
 load_dotenv()
 LOGGER = logging.getLogger("full_pipeline_runner")
 
+PRIMARY_PDF_MARKER = ".primary_pdf"
+
+
+def _primary_pdf_marker(submission_dir: Path) -> Path:
+    return submission_dir / PRIMARY_PDF_MARKER
+
+
+def _read_recorded_pdf(submission_dir: Path) -> Optional[Path]:
+    marker = _primary_pdf_marker(submission_dir)
+    if not marker.exists():
+        return None
+
+    try:
+        recorded_name = marker.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        LOGGER.warning("Unable to read primary PDF marker %s: %s", marker, exc)
+        return None
+
+    if not recorded_name:
+        return None
+
+    candidate = submission_dir / recorded_name
+    return candidate if candidate.exists() else None
+
+
+def _write_recorded_pdf(submission_dir: Path, pdf_path: Path) -> None:
+    marker = _primary_pdf_marker(submission_dir)
+    try:
+        marker.write_text(pdf_path.name, encoding="utf-8")
+    except OSError as exc:
+        LOGGER.warning("Unable to write primary PDF marker %s: %s", marker, exc)
+
 
 @dataclass
 class Step:
@@ -74,6 +106,11 @@ def prepare_pdf(submission_dir: Path, submission_id: str, pdf_path: Optional[Pat
     """Ensure the submission PDF is available under the submission directory."""
 
     if pdf_path is None:
+        recorded = _read_recorded_pdf(submission_dir)
+        if recorded is not None:
+            LOGGER.info("Using recorded primary PDF: %s", recorded)
+            return recorded
+
         # Attempt to locate an existing PDF in the submission directory.
         for candidate in (
             submission_dir / f"{submission_id}.pdf",
@@ -82,6 +119,7 @@ def prepare_pdf(submission_dir: Path, submission_id: str, pdf_path: Optional[Pat
         ):
             if candidate.exists():
                 LOGGER.info("Using existing PDF: %s", candidate)
+                _write_recorded_pdf(submission_dir, candidate)
                 return candidate
         raise FileNotFoundError(
             "No PDF supplied and none found in the submission directory."
@@ -90,13 +128,18 @@ def prepare_pdf(submission_dir: Path, submission_id: str, pdf_path: Optional[Pat
     if not pdf_path.exists():
         raise FileNotFoundError(f"Provided PDF does not exist: {pdf_path}")
 
-    destination = submission_dir / f"{submission_id}{pdf_path.suffix.lower()}"
+    destination = submission_dir / pdf_path.name
 
     if pdf_path.resolve() != destination.resolve():
-        LOGGER.info("Copying PDF into submission workspace: %s -> %s", pdf_path, destination)
+        if destination.exists():
+            LOGGER.info("Overwriting existing PDF in workspace: %s", destination)
+        else:
+            LOGGER.info("Copying PDF into submission workspace: %s -> %s", pdf_path, destination)
         shutil.copy2(pdf_path, destination)
     else:
         LOGGER.info("PDF already located in submission workspace: %s", destination)
+
+    _write_recorded_pdf(submission_dir, destination)
 
     return destination
 
