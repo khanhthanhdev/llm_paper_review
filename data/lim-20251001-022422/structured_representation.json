@@ -1,0 +1,587 @@
+{
+    "structured_representation": {
+        "main_paper": {
+            "raw": "methods=['LessIsMore: A training-free sparse attention mechanism', 'Unified Attention Head Selection: Aggregates head-level top-k selections', 'Stable Recency Window: Reserves recent contextual information'] problems=['Excessive computational overhead in large reasoning models due to token generation', 'Accuracy degradation in existing sparse attention mechanisms during long-generation reasoning', 'Need for high token retention rates or expensive retraining in current methods'] datasets=['Qwen3-8B', 'Qwen3-4B', 'AIME-24/25', 'GPQA-Diamond', 'MATH500'] metrics=['Decoding speed-up', 'Sparsity level', 'End-to-end inference speed-up', 'Accuracy'] results=[ResultEntry(metric='Average decoding speed-up', value='1.1\u00d7'), ResultEntry(metric='Sparsity level', value='87.5% on AIME-24'), ResultEntry(metric='End-to-end inference speed-up', value='1.13\u00d7'), ResultEntry(metric='Token reduction', value='2\u00d7 fewer tokens attended'), ResultEntry(metric='Generation length reduction', value='7% shorter generation length')] novelty_claims=['First detailed, token-level analysis of attention distributions in reasoning tasks', 'Revealing spatial and recency locality patterns in attention heads', 'Proposing a training-free sparse attention mechanism that aggregates local information into a global pattern', 'Achieving higher accuracy with lower latency without retraining', 'Maintaining full accuracy at higher sparsity levels compared to existing methods']",
+            "parsed": {
+                "methods": [
+                    "LessIsMore: A training-free sparse attention mechanism",
+                    "Unified Attention Head Selection: Aggregates head-level top-k selections",
+                    "Stable Recency Window: Reserves recent contextual information"
+                ],
+                "problems": [
+                    "Excessive computational overhead in large reasoning models due to token generation",
+                    "Accuracy degradation in existing sparse attention mechanisms during long-generation reasoning",
+                    "Need for high token retention rates or expensive retraining in current methods"
+                ],
+                "datasets": [
+                    "Qwen3-8B",
+                    "Qwen3-4B",
+                    "AIME-24/25",
+                    "GPQA-Diamond",
+                    "MATH500"
+                ],
+                "metrics": [
+                    "Decoding speed-up",
+                    "Sparsity level",
+                    "End-to-end inference speed-up",
+                    "Accuracy"
+                ],
+                "results": [
+                    {
+                        "metric": "Average decoding speed-up",
+                        "value": "1.1\u00d7"
+                    },
+                    {
+                        "metric": "Sparsity level",
+                        "value": "87.5% on AIME-24"
+                    },
+                    {
+                        "metric": "End-to-end inference speed-up",
+                        "value": "1.13\u00d7"
+                    },
+                    {
+                        "metric": "Token reduction",
+                        "value": "2\u00d7 fewer tokens attended"
+                    },
+                    {
+                        "metric": "Generation length reduction",
+                        "value": "7% shorter generation length"
+                    }
+                ],
+                "novelty_claims": [
+                    "First detailed, token-level analysis of attention distributions in reasoning tasks",
+                    "Revealing spatial and recency locality patterns in attention heads",
+                    "Proposing a training-free sparse attention mechanism that aggregates local information into a global pattern",
+                    "Achieving higher accuracy with lower latency without retraining",
+                    "Maintaining full accuracy at higher sparsity levels compared to existing methods"
+                ]
+            }
+        },
+        "selected_papers": [
+            {
+                "paper_id": "23c2e21b6a5789724715f2986fdc586a517ffe57",
+                "raw": "methods=['Natively trainable Sparse Attention (NSA)', 'Dynamic hierarchical sparse strategy', 'Coarse-grained token compression', 'Fine-grained token selection', 'Hardware-aligned optimizations', 'End-to-end training with trainable operators'] problems=['High computational cost of standard attention mechanisms', 'Latency bottleneck in long-context modeling', 'Inefficiency of existing sparse attention methods in practical deployments', 'Lack of effective training-time support in sparse attention methods'] datasets=['Real-world language corpora'] metrics=['General language evaluations', 'Long-context evaluations', 'Chain-of-thought reasoning evaluation', 'Kernel speed on A100 GPUs'] results=[ResultEntry(metric='Performance on general benchmarks', value='Comparable or superior to Full Attention'), ResultEntry(metric='Performance on long-context tasks', value='Comparable or superior to Full Attention'), ResultEntry(metric='Performance on reasoning evaluation', value='Comparable or superior to Full Attention'), ResultEntry(metric='Speedup on 64k-length sequences', value='Substantial speedup over Full Attention'), ResultEntry(metric='Kernel speed on A100 GPUs', value='Substantial speedup over Full Attention')] novelty_claims=['NSA integrates algorithmic innovations with hardware-aligned optimizations for efficient long-context modeling.', 'NSA employs a dynamic hierarchical sparse strategy to preserve global context awareness and local precision.', 'NSA achieves substantial speedups through arithmetic intensity-balanced algorithm design.', 'NSA enables end-to-end training, reducing pretraining computation without sacrificing model performance.', 'NSA introduces hardware-aligned system optimizations for Tensor Core utilization and memory access.']",
+                "parsed": {
+                    "methods": [
+                        "Natively trainable Sparse Attention (NSA)",
+                        "Dynamic hierarchical sparse strategy",
+                        "Coarse-grained token compression",
+                        "Fine-grained token selection",
+                        "Hardware-aligned optimizations",
+                        "End-to-end training with trainable operators"
+                    ],
+                    "problems": [
+                        "High computational cost of standard attention mechanisms",
+                        "Latency bottleneck in long-context modeling",
+                        "Inefficiency of existing sparse attention methods in practical deployments",
+                        "Lack of effective training-time support in sparse attention methods"
+                    ],
+                    "datasets": [
+                        "Real-world language corpora"
+                    ],
+                    "metrics": [
+                        "General language evaluations",
+                        "Long-context evaluations",
+                        "Chain-of-thought reasoning evaluation",
+                        "Kernel speed on A100 GPUs"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Performance on general benchmarks",
+                            "value": "Comparable or superior to Full Attention"
+                        },
+                        {
+                            "metric": "Performance on long-context tasks",
+                            "value": "Comparable or superior to Full Attention"
+                        },
+                        {
+                            "metric": "Performance on reasoning evaluation",
+                            "value": "Comparable or superior to Full Attention"
+                        },
+                        {
+                            "metric": "Speedup on 64k-length sequences",
+                            "value": "Substantial speedup over Full Attention"
+                        },
+                        {
+                            "metric": "Kernel speed on A100 GPUs",
+                            "value": "Substantial speedup over Full Attention"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "NSA integrates algorithmic innovations with hardware-aligned optimizations for efficient long-context modeling.",
+                        "NSA employs a dynamic hierarchical sparse strategy to preserve global context awareness and local precision.",
+                        "NSA achieves substantial speedups through arithmetic intensity-balanced algorithm design.",
+                        "NSA enables end-to-end training, reducing pretraining computation without sacrificing model performance.",
+                        "NSA introduces hardware-aligned system optimizations for Tensor Core utilization and memory access."
+                    ]
+                }
+            },
+            {
+                "paper_id": "a336bf38ebfdadd2992f9f976c963f7280c99d5f",
+                "raw": "methods=['TidalDecode algorithm', 'Position Persistent Sparse Attention (PPSA)', 'Token selection layers with full attention', 'Cache-correction mechanism'] problems=['Memory constraints during LLM decoding due to expanding KV cache size', 'Inefficiency of existing sparse attention mechanisms in identifying relevant tokens', 'Overhead in token selection across consecutive Transformer layers', 'KV cache distribution shift'] datasets=['Needle-in-the-Haystack', 'PG-19', 'LongBench'] metrics=['Generative performance', 'Decoding latency', 'Performance efficiency trade-off'] results=[ResultEntry(metric='Decoding latency reduction compared to full attention', value='2.1x'), ResultEntry(metric='Decoding latency reduction compared to existing sparse attention', value='1.2x')] novelty_claims=['Introduction of TidalDecode for fast and accurate LLM decoding', 'Utilization of position persistent sparse attention to leverage spatial coherence', 'Reduction of token selection overhead without sacrificing result quality', 'Cache-correction mechanism to address KV cache distribution shift']",
+                "parsed": {
+                    "methods": [
+                        "TidalDecode algorithm",
+                        "Position Persistent Sparse Attention (PPSA)",
+                        "Token selection layers with full attention",
+                        "Cache-correction mechanism"
+                    ],
+                    "problems": [
+                        "Memory constraints during LLM decoding due to expanding KV cache size",
+                        "Inefficiency of existing sparse attention mechanisms in identifying relevant tokens",
+                        "Overhead in token selection across consecutive Transformer layers",
+                        "KV cache distribution shift"
+                    ],
+                    "datasets": [
+                        "Needle-in-the-Haystack",
+                        "PG-19",
+                        "LongBench"
+                    ],
+                    "metrics": [
+                        "Generative performance",
+                        "Decoding latency",
+                        "Performance efficiency trade-off"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Decoding latency reduction compared to full attention",
+                            "value": "2.1x"
+                        },
+                        {
+                            "metric": "Decoding latency reduction compared to existing sparse attention",
+                            "value": "1.2x"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "Introduction of TidalDecode for fast and accurate LLM decoding",
+                        "Utilization of position persistent sparse attention to leverage spatial coherence",
+                        "Reduction of token selection overhead without sacrificing result quality",
+                        "Cache-correction mechanism to address KV cache distribution shift"
+                    ]
+                }
+            },
+            {
+                "paper_id": "8f3d959238e67bf6b9bc9818025d0d2e403e478f",
+                "raw": "methods=['DuoAttention framework', 'Lightweight optimization-based algorithm for retrieval head identification', 'Full KV cache for retrieval heads', 'Constant-length KV cache for streaming heads', 'Integration with quantization techniques'] problems=['High memory consumption in long-context LLM inference', 'Increased latency in decoding and pre-filling for long-context sequences', 'Inefficiency of existing KV cache pruning methods', 'Challenges in deploying LLMs for applications requiring million-level context handling'] datasets=['Synthetic datasets for retrieval head identification'] metrics=['Memory reduction', 'Decoding speed', 'Pre-filling speed', 'Accuracy loss'] results=[ResultEntry(metric='Memory reduction for MHA models', value='2.55x'), ResultEntry(metric='Memory reduction for GQA models', value='1.67x'), ResultEntry(metric='Decoding speed increase for MHA models', value='2.18x'), ResultEntry(metric='Decoding speed increase for GQA models', value='1.50x'), ResultEntry(metric='Pre-filling speed increase for MHA models', value='1.73x'), ResultEntry(metric='Pre-filling speed increase for GQA models', value='1.63x'), ResultEntry(metric='Context length capacity increase on A100 GPU', value='6.4x')] novelty_claims=['Introduction of DuoAttention framework for efficient long-context LLM inference', 'Categorization of attention heads into Retrieval and Streaming Heads', 'Use of lightweight optimization-based algorithm for identifying retrieval heads', 'Significant memory and latency reduction without compromising long-context capabilities', 'Compatibility with quantization and other optimization techniques']",
+                "parsed": {
+                    "methods": [
+                        "DuoAttention framework",
+                        "Lightweight optimization-based algorithm for retrieval head identification",
+                        "Full KV cache for retrieval heads",
+                        "Constant-length KV cache for streaming heads",
+                        "Integration with quantization techniques"
+                    ],
+                    "problems": [
+                        "High memory consumption in long-context LLM inference",
+                        "Increased latency in decoding and pre-filling for long-context sequences",
+                        "Inefficiency of existing KV cache pruning methods",
+                        "Challenges in deploying LLMs for applications requiring million-level context handling"
+                    ],
+                    "datasets": [
+                        "Synthetic datasets for retrieval head identification"
+                    ],
+                    "metrics": [
+                        "Memory reduction",
+                        "Decoding speed",
+                        "Pre-filling speed",
+                        "Accuracy loss"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Memory reduction for MHA models",
+                            "value": "2.55x"
+                        },
+                        {
+                            "metric": "Memory reduction for GQA models",
+                            "value": "1.67x"
+                        },
+                        {
+                            "metric": "Decoding speed increase for MHA models",
+                            "value": "2.18x"
+                        },
+                        {
+                            "metric": "Decoding speed increase for GQA models",
+                            "value": "1.50x"
+                        },
+                        {
+                            "metric": "Pre-filling speed increase for MHA models",
+                            "value": "1.73x"
+                        },
+                        {
+                            "metric": "Pre-filling speed increase for GQA models",
+                            "value": "1.63x"
+                        },
+                        {
+                            "metric": "Context length capacity increase on A100 GPU",
+                            "value": "6.4x"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "Introduction of DuoAttention framework for efficient long-context LLM inference",
+                        "Categorization of attention heads into Retrieval and Streaming Heads",
+                        "Use of lightweight optimization-based algorithm for identifying retrieval heads",
+                        "Significant memory and latency reduction without compromising long-context capabilities",
+                        "Compatibility with quantization and other optimization techniques"
+                    ]
+                }
+            },
+            {
+                "paper_id": "5b2c04e082a56c0eb70ed62bc36148919f665e1c",
+                "raw": "methods=['SampleAttention: An adaptive structured sparse attention mechanism', 'Two-stage query-guided key-value filtering approach', 'Cumulative Residual Attention (CRA) metric for evaluating model accuracy', 'Automated tuning method using a small profiling dataset', 'Hardware-efficient kernels for reduced computation overhead'] problems=['Quadratic complexity of vanilla attention leading to high Time-to-First-Token (TTFT) latency', 'Existing methods requiring additional pretraining or finetuning and sacrificing model accuracy', 'Inability of static sparse patterns to capture dynamic sparse patterns across heads and inputs', 'Challenges in determining optimal sparsity ratio and pattern at runtime'] datasets=['ChatGLM (GLM et al., 2024)', 'YI (Young et al., 2024)', 'InternLM (Cai et al., 2024)'] metrics=['Time-to-First-Token (TTFT) latency', 'Cumulative Residual Attention (CRA)'] results=[ResultEntry(metric='TTFT reduction compared to FlashAttention', value='up to 5.29x'), ResultEntry(metric='Accuracy loss', value='nearly no accuracy loss')] novelty_claims=['SampleAttention dynamically determines sparse ratios and patterns at runtime.', 'It introduces a robust metric called Cumulative Residual Attention (CRA) for evaluating model accuracy.', 'SampleAttention employs a two-stage query-guided key-value filtering method to efficiently identify important patterns.', 'The approach significantly accelerates vanilla attention by reducing both I/O and computation requirements.', 'SampleAttention can be combined with existing KV cache eviction approaches to further reduce memory consumption.']",
+                "parsed": {
+                    "methods": [
+                        "SampleAttention: An adaptive structured sparse attention mechanism",
+                        "Two-stage query-guided key-value filtering approach",
+                        "Cumulative Residual Attention (CRA) metric for evaluating model accuracy",
+                        "Automated tuning method using a small profiling dataset",
+                        "Hardware-efficient kernels for reduced computation overhead"
+                    ],
+                    "problems": [
+                        "Quadratic complexity of vanilla attention leading to high Time-to-First-Token (TTFT) latency",
+                        "Existing methods requiring additional pretraining or finetuning and sacrificing model accuracy",
+                        "Inability of static sparse patterns to capture dynamic sparse patterns across heads and inputs",
+                        "Challenges in determining optimal sparsity ratio and pattern at runtime"
+                    ],
+                    "datasets": [
+                        "ChatGLM (GLM et al., 2024)",
+                        "YI (Young et al., 2024)",
+                        "InternLM (Cai et al., 2024)"
+                    ],
+                    "metrics": [
+                        "Time-to-First-Token (TTFT) latency",
+                        "Cumulative Residual Attention (CRA)"
+                    ],
+                    "results": [
+                        {
+                            "metric": "TTFT reduction compared to FlashAttention",
+                            "value": "up to 5.29x"
+                        },
+                        {
+                            "metric": "Accuracy loss",
+                            "value": "nearly no accuracy loss"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "SampleAttention dynamically determines sparse ratios and patterns at runtime.",
+                        "It introduces a robust metric called Cumulative Residual Attention (CRA) for evaluating model accuracy.",
+                        "SampleAttention employs a two-stage query-guided key-value filtering method to efficiently identify important patterns.",
+                        "The approach significantly accelerates vanilla attention by reducing both I/O and computation requirements.",
+                        "SampleAttention can be combined with existing KV cache eviction approaches to further reduce memory consumption."
+                    ]
+                }
+            },
+            {
+                "paper_id": "1784c987e681d60c634765fe64c8d9c26f73d5ff",
+                "raw": "methods=['SnapKV: A fine-tuning-free approach to minimize KV cache size', 'Automatic compression of KV caches by selecting clustered important KV positions for each attention head', \"Utilization of an 'observation' window to identify attention patterns\", 'Integration with popular deep-learning frameworks with minimal code adjustments'] problems=['Memory and time efficiency challenges due to the growth of KV cache with increasing input length', 'Decoding latency per step grows linearly with prompt length', 'Significant memory capacity required for large KV cache', 'Limitation in model scalability due to hardware demands', 'Inefficiency in processing long context prompts', 'Inference latency and memory utilization overhead in practical applications like chatbots and agents'] datasets=['16 long sequence datasets'] metrics=['Decoding speed', 'Memory efficiency', 'Accuracy'] results=[ResultEntry(metric='Decoding speed', value='3.6x increase compared to baseline'), ResultEntry(metric='Memory efficiency', value='8.2x enhancement compared to baseline'), ResultEntry(metric='Context token processing', value='Up to 380K on a single A100-80GB GPU'), ResultEntry(metric='Accuracy drop', value='Negligible in Needle-in-a-Haystack test')] novelty_claims=['SnapKV efficiently minimizes KV cache size while maintaining performance without fine-tuning', 'Discovery of consistent attention allocation pattern in LLMs during generation', \"SnapKV's ability to compress KV cache for long sequence prompts without compromising accuracy\", 'Integration of SnapKV into existing frameworks with minimal modifications']",
+                "parsed": {
+                    "methods": [
+                        "SnapKV: A fine-tuning-free approach to minimize KV cache size",
+                        "Automatic compression of KV caches by selecting clustered important KV positions for each attention head",
+                        "Utilization of an 'observation' window to identify attention patterns",
+                        "Integration with popular deep-learning frameworks with minimal code adjustments"
+                    ],
+                    "problems": [
+                        "Memory and time efficiency challenges due to the growth of KV cache with increasing input length",
+                        "Decoding latency per step grows linearly with prompt length",
+                        "Significant memory capacity required for large KV cache",
+                        "Limitation in model scalability due to hardware demands",
+                        "Inefficiency in processing long context prompts",
+                        "Inference latency and memory utilization overhead in practical applications like chatbots and agents"
+                    ],
+                    "datasets": [
+                        "16 long sequence datasets"
+                    ],
+                    "metrics": [
+                        "Decoding speed",
+                        "Memory efficiency",
+                        "Accuracy"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Decoding speed",
+                            "value": "3.6x increase compared to baseline"
+                        },
+                        {
+                            "metric": "Memory efficiency",
+                            "value": "8.2x enhancement compared to baseline"
+                        },
+                        {
+                            "metric": "Context token processing",
+                            "value": "Up to 380K on a single A100-80GB GPU"
+                        },
+                        {
+                            "metric": "Accuracy drop",
+                            "value": "Negligible in Needle-in-a-Haystack test"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "SnapKV efficiently minimizes KV cache size while maintaining performance without fine-tuning",
+                        "Discovery of consistent attention allocation pattern in LLMs during generation",
+                        "SnapKV's ability to compress KV cache for long sequence prompts without compromising accuracy",
+                        "Integration of SnapKV into existing frameworks with minimal modifications"
+                    ]
+                }
+            },
+            {
+                "paper_id": "3b430f665a04e8ccc5fac30ff39b42d4c6cc893d",
+                "raw": "methods=['Twilight framework', 'Top-p sampling for sparse attention', 'Hierarchical KV cache pruning'] problems=['Fixed budget in sparse attention algorithms', 'Dynamic nature of real-world scenarios affecting accuracy and efficiency', 'Difficulty in identifying optimal KV cache budget', 'Over-selection and under-selection in top-k sparse attention'] datasets=['GSM8K', 'COQA', 'PG19', 'Longbench'] metrics=['Accuracy', 'Efficiency', 'Self-attention speedup', 'End-to-end per token latency'] results=[ResultEntry(metric='Self-attention speedup', value='15.4x'), ResultEntry(metric='End-to-end per token latency speedup', value='3.9x')] novelty_claims=['Introduction of top-p sampling to sparse attention for adaptive budgeting', 'Twilight framework enhances existing sparse attention algorithms with adaptive budgeting', 'Dynamic determination of KV cache budget using top-p sampling']",
+                "parsed": {
+                    "methods": [
+                        "Twilight framework",
+                        "Top-p sampling for sparse attention",
+                        "Hierarchical KV cache pruning"
+                    ],
+                    "problems": [
+                        "Fixed budget in sparse attention algorithms",
+                        "Dynamic nature of real-world scenarios affecting accuracy and efficiency",
+                        "Difficulty in identifying optimal KV cache budget",
+                        "Over-selection and under-selection in top-k sparse attention"
+                    ],
+                    "datasets": [
+                        "GSM8K",
+                        "COQA",
+                        "PG19",
+                        "Longbench"
+                    ],
+                    "metrics": [
+                        "Accuracy",
+                        "Efficiency",
+                        "Self-attention speedup",
+                        "End-to-end per token latency"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Self-attention speedup",
+                            "value": "15.4x"
+                        },
+                        {
+                            "metric": "End-to-end per token latency speedup",
+                            "value": "3.9x"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "Introduction of top-p sampling to sparse attention for adaptive budgeting",
+                        "Twilight framework enhances existing sparse attention algorithms with adaptive budgeting",
+                        "Dynamic determination of KV cache budget using top-p sampling"
+                    ]
+                }
+            },
+            {
+                "paper_id": "04b2f3d742f33c372df81d8af2ea34c8fec629fb",
+                "raw": "methods=['SeerAttention-R: A sparse attention framework for long decoding in reasoning models', 'Self-distilled gating mechanism for learning attention sparsity', 'Removal of query pooling for auto-regressive decoding', 'Shared sparsity design aligned with Grouped Query Attention (GQA)', 'Integration into pretrained models without modifying original parameters', 'TileLang-based optimized sparse decoding kernel'] problems=['Efficiency challenges in long-sequence reasoning models', 'Increased compute and memory demands due to auto-regressive decoding', 'Identifying and leveraging intrinsic sparsity in reasoning models'] datasets=['AIME24', 'AIME25', 'MATH-500', 'GPQA-Diamond', 'OpenR1-MATH-220K'] metrics=['Reasoning accuracy', 'Speedup over FlashAttention-3', 'Speedup over Triton'] results=[ResultEntry(metric='Reasoning accuracy', value='Near-lossless under 4K token budget'), ResultEntry(metric='Speedup over FlashAttention-3', value='Up to 9x at 90% sparsity on H100 GPU'), ResultEntry(metric='Speedup over Triton', value='1.7x at large sequence lengths and batch sizes')] novelty_claims=['SeerAttention-R introduces a sparse attention framework specifically for long decoding in reasoning models.', 'The framework retains self-distilled attention sparsity while removing query pooling for auto-regressive decoding.', 'SeerAttention-R can be integrated into existing pretrained models without modifying original parameters.', 'The TileLang-based kernel achieves near-theoretical speedups over existing methods.']",
+                "parsed": {
+                    "methods": [
+                        "SeerAttention-R: A sparse attention framework for long decoding in reasoning models",
+                        "Self-distilled gating mechanism for learning attention sparsity",
+                        "Removal of query pooling for auto-regressive decoding",
+                        "Shared sparsity design aligned with Grouped Query Attention (GQA)",
+                        "Integration into pretrained models without modifying original parameters",
+                        "TileLang-based optimized sparse decoding kernel"
+                    ],
+                    "problems": [
+                        "Efficiency challenges in long-sequence reasoning models",
+                        "Increased compute and memory demands due to auto-regressive decoding",
+                        "Identifying and leveraging intrinsic sparsity in reasoning models"
+                    ],
+                    "datasets": [
+                        "AIME24",
+                        "AIME25",
+                        "MATH-500",
+                        "GPQA-Diamond",
+                        "OpenR1-MATH-220K"
+                    ],
+                    "metrics": [
+                        "Reasoning accuracy",
+                        "Speedup over FlashAttention-3",
+                        "Speedup over Triton"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Reasoning accuracy",
+                            "value": "Near-lossless under 4K token budget"
+                        },
+                        {
+                            "metric": "Speedup over FlashAttention-3",
+                            "value": "Up to 9x at 90% sparsity on H100 GPU"
+                        },
+                        {
+                            "metric": "Speedup over Triton",
+                            "value": "1.7x at large sequence lengths and batch sizes"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "SeerAttention-R introduces a sparse attention framework specifically for long decoding in reasoning models.",
+                        "The framework retains self-distilled attention sparsity while removing query pooling for auto-regressive decoding.",
+                        "SeerAttention-R can be integrated into existing pretrained models without modifying original parameters.",
+                        "The TileLang-based kernel achieves near-theoretical speedups over existing methods."
+                    ]
+                }
+            },
+            {
+                "paper_id": "ee2b3f7703b553b487428862b83995ea3e8c0c3a",
+                "raw": "methods=['SPARSEK Attention', 'Scoring network for KV pair importance', 'Differentiable top-k mask operator', 'Incremental KV selection', 'Triton kernel for fused computation'] problems=['Quadratic computational complexity in self-attention', 'Substantial KV memory requirements in Transformers', 'Inefficiency of traditional sparse attention methods for long-range Transformers', 'Memory redundancy in clustering-based methods', 'Super-linear complexity in previous sparse attention methods'] datasets=['Language modeling datasets', 'Downstream task datasets'] metrics=['Training time complexity', 'Inference time complexity', 'Memory cost', 'Speed improvements'] results=[ResultEntry(metric='Training time complexity', value='Linear time complexity achieved'), ResultEntry(metric='Inference time complexity', value='Constant memory footprint'), ResultEntry(metric='Speed improvements', value='Significant speed improvements during training and inference')] novelty_claims=['Introduction of SPARSEK Attention for efficient sparse attention', 'Linear time complexity and constant memory footprint during generation', 'Seamless integration into pre-trained LLMs with minimal fine-tuning', 'Fused computation of attention and KV selection for efficiency', 'Outperformance of previous sparse attention methods in speed and efficiency']",
+                "parsed": {
+                    "methods": [
+                        "SPARSEK Attention",
+                        "Scoring network for KV pair importance",
+                        "Differentiable top-k mask operator",
+                        "Incremental KV selection",
+                        "Triton kernel for fused computation"
+                    ],
+                    "problems": [
+                        "Quadratic computational complexity in self-attention",
+                        "Substantial KV memory requirements in Transformers",
+                        "Inefficiency of traditional sparse attention methods for long-range Transformers",
+                        "Memory redundancy in clustering-based methods",
+                        "Super-linear complexity in previous sparse attention methods"
+                    ],
+                    "datasets": [
+                        "Language modeling datasets",
+                        "Downstream task datasets"
+                    ],
+                    "metrics": [
+                        "Training time complexity",
+                        "Inference time complexity",
+                        "Memory cost",
+                        "Speed improvements"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Training time complexity",
+                            "value": "Linear time complexity achieved"
+                        },
+                        {
+                            "metric": "Inference time complexity",
+                            "value": "Constant memory footprint"
+                        },
+                        {
+                            "metric": "Speed improvements",
+                            "value": "Significant speed improvements during training and inference"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "Introduction of SPARSEK Attention for efficient sparse attention",
+                        "Linear time complexity and constant memory footprint during generation",
+                        "Seamless integration into pre-trained LLMs with minimal fine-tuning",
+                        "Fused computation of attention and KV selection for efficiency",
+                        "Outperformance of previous sparse attention methods in speed and efficiency"
+                    ]
+                }
+            },
+            {
+                "paper_id": "952fb6413499bc377faa51bf71e4d558ac6f6387",
+                "raw": "methods=['Mixture of Attention (MoA)', 'Heterogeneous Elastic Rules', 'Automatic Optimization Pipeline', 'Gradient-based Profiling'] problems=['Efficiency challenges of long contexts in LLMs', 'Uniform sparse attention masks failing to capture diverse attention patterns', 'Excessive compute and memory budget for local-context heads', 'Inability to scale attention spans differently for various heads', 'Inaccurate profiling of compression influence on long-context tasks'] datasets=['Vicuna-7B', 'Vicuna-13B', 'Llama3-8B', 'Llama3-70B', 'LongEval benchmark'] metrics=['Effective context length', 'Retrieval accuracy', 'GPU memory reduction', 'Decode throughput', 'Performance drop'] results=[ResultEntry(metric='Effective context length increase', value='3.9x'), ResultEntry(metric='Retrieval accuracy improvement', value='1.5-7.1x over uniform-attention baseline'), ResultEntry(metric='Maximum relative performance drop reduction', value='from 9%-36% to within 5%'), ResultEntry(metric='GPU memory reduction', value='1.2-1.4x'), ResultEntry(metric='Decode throughput improvement over FlashAttention2', value='6.6-8.2x'), ResultEntry(metric='Decode throughput improvement over vLLM', value='1.7-1.9x')] novelty_claims=['Proposes a training-free sparse attention method', 'Introduces heterogeneous elastic rules for attention heads', 'Constructs a search space of attention patterns and scaling rules', 'Profiles model to tailor sparse attention configurations', 'Reduces capability gaps between sparse and dense models']",
+                "parsed": {
+                    "methods": [
+                        "Mixture of Attention (MoA)",
+                        "Heterogeneous Elastic Rules",
+                        "Automatic Optimization Pipeline",
+                        "Gradient-based Profiling"
+                    ],
+                    "problems": [
+                        "Efficiency challenges of long contexts in LLMs",
+                        "Uniform sparse attention masks failing to capture diverse attention patterns",
+                        "Excessive compute and memory budget for local-context heads",
+                        "Inability to scale attention spans differently for various heads",
+                        "Inaccurate profiling of compression influence on long-context tasks"
+                    ],
+                    "datasets": [
+                        "Vicuna-7B",
+                        "Vicuna-13B",
+                        "Llama3-8B",
+                        "Llama3-70B",
+                        "LongEval benchmark"
+                    ],
+                    "metrics": [
+                        "Effective context length",
+                        "Retrieval accuracy",
+                        "GPU memory reduction",
+                        "Decode throughput",
+                        "Performance drop"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Effective context length increase",
+                            "value": "3.9x"
+                        },
+                        {
+                            "metric": "Retrieval accuracy improvement",
+                            "value": "1.5-7.1x over uniform-attention baseline"
+                        },
+                        {
+                            "metric": "Maximum relative performance drop reduction",
+                            "value": "from 9%-36% to within 5%"
+                        },
+                        {
+                            "metric": "GPU memory reduction",
+                            "value": "1.2-1.4x"
+                        },
+                        {
+                            "metric": "Decode throughput improvement over FlashAttention2",
+                            "value": "6.6-8.2x"
+                        },
+                        {
+                            "metric": "Decode throughput improvement over vLLM",
+                            "value": "1.7-1.9x"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "Proposes a training-free sparse attention method",
+                        "Introduces heterogeneous elastic rules for attention heads",
+                        "Constructs a search space of attention patterns and scaling rules",
+                        "Profiles model to tailor sparse attention configurations",
+                        "Reduces capability gaps between sparse and dense models"
+                    ]
+                }
+            },
+            {
+                "paper_id": "cf7ab5df804575bad88a9fcf0fbf7707bf500944",
+                "raw": "methods=['Dual Chunk Attention (DCA)', 'Intra-Chunk Attention', 'Inter-Chunk Attention', 'Successive Chunk Attention', 'Integration with Flash Attention 2'] problems=['Processing and generating coherent text with input tokens exceeding pretraining length', 'High cost and limited accessibility of long-context finetuning', 'Maintaining low perplexity while retaining long-range dependencies', 'Extrapolating context windows without additional training'] datasets=['Language modeling tasks', 'Passkey retrieval tasks', 'Real-world long-context applications (e.g., question answering, summarization)'] metrics=['Perplexity (PPL)', 'Passkey retrieval accuracy'] results=[ResultEntry(metric='Perplexity (PPL)', value='Negligible increase when expanding context window to more than 32k without training'), ResultEntry(metric='Extrapolation capability', value='Handles context sizes exceeding 100k tokens'), ResultEntry(metric='Passkey retrieval accuracy', value='High accuracy maintained at 192k context length')] novelty_claims=['Introduction of Dual Chunk Attention (DCA) for training-free long-context scaling', 'Ability to support context windows of more than 100k tokens without continual training', 'Orthogonality to existing scaled positional encodings, allowing further extrapolation', 'Comparable or superior performance to finetuned models on long-context tasks']",
+                "parsed": {
+                    "methods": [
+                        "Dual Chunk Attention (DCA)",
+                        "Intra-Chunk Attention",
+                        "Inter-Chunk Attention",
+                        "Successive Chunk Attention",
+                        "Integration with Flash Attention 2"
+                    ],
+                    "problems": [
+                        "Processing and generating coherent text with input tokens exceeding pretraining length",
+                        "High cost and limited accessibility of long-context finetuning",
+                        "Maintaining low perplexity while retaining long-range dependencies",
+                        "Extrapolating context windows without additional training"
+                    ],
+                    "datasets": [
+                        "Language modeling tasks",
+                        "Passkey retrieval tasks",
+                        "Real-world long-context applications (e.g., question answering, summarization)"
+                    ],
+                    "metrics": [
+                        "Perplexity (PPL)",
+                        "Passkey retrieval accuracy"
+                    ],
+                    "results": [
+                        {
+                            "metric": "Perplexity (PPL)",
+                            "value": "Negligible increase when expanding context window to more than 32k without training"
+                        },
+                        {
+                            "metric": "Extrapolation capability",
+                            "value": "Handles context sizes exceeding 100k tokens"
+                        },
+                        {
+                            "metric": "Passkey retrieval accuracy",
+                            "value": "High accuracy maintained at 192k context length"
+                        }
+                    ],
+                    "novelty_claims": [
+                        "Introduction of Dual Chunk Attention (DCA) for training-free long-context scaling",
+                        "Ability to support context windows of more than 100k tokens without continual training",
+                        "Orthogonality to existing scaled positional encodings, allowing further extrapolation",
+                        "Comparable or superior performance to finetuned models on long-context tasks"
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,25 @@
+{
+  "submission_id": "lim-20251001-022422",
+  "queries_used": [
+    "training-free attention",
+    "global locality",
+    "efficient reasoning",
+    "sparse attention"
+  ],
+  "total_cost": 0.00134,
+  "num_cited_papers": 19,
+  "num_query_papers": 80,
+  "num_final_ranked": 15,
+  "num_all_retrieved": 79,
+  "pdf_download": {
+    "total_papers": 15,
+    "pdfs_downloaded": 15,
+    "download_success_rate": 100.0,
+    "download_timestamp": "2025-10-01 02:26:22",
+    "stats": {
+      "downloaded": 15,
+      "failed": 0,
+      "not_found": 0
+    }
+  }
+}

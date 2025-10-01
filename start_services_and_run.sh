@@ -27,6 +27,12 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
+# Install required system dependencies
+if ! ldconfig -p | grep -q libGL.so.1; then
+  echo "Installing libgl1 (required for OpenCV and image processing)..."
+  sudo apt-get update -qq && sudo apt-get install -y libgl1
+fi
+
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required but not found in PATH"
   exit 1

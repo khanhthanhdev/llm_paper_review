@@ -1,10 +1,10 @@
 {
    "summary": {
-      "total_cost": 0.0034739999999999997,
+      "total_cost": 0.003352,
       "token_usage": {
          "completion_tokens": 169,
-         "prompt_tokens": 1061,
-         "total_tokens": 1230,
+         "prompt_tokens": 1000,
+         "total_tokens": 1169,
          "completion_tokens_details": {
             "accepted_prediction_tokens": 0,
             "audio_tokens": 0,

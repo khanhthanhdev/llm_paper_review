@@ -1,0 +1,775 @@
+{
+  "filename": "lim-20251001-022422_fulltext",
+  "title": "LESS IS MORE: TRAINING-FREE SPARSE ATTENTION WITH GLOBAL LOCALITY FOR EFFICIENT REASONING",
+  "abstract": "Large reasoning models achieve strong performance through test-time scaling but incur substantial computational overhead, particularly from excessive token generation when processing short input prompts. While sparse attention mechanisms can reduce latency and memory usage, existing approaches suffer from significant accuracy degradation due to accumulated errors during long-generation reasoning. These methods generally require either high token retention rates or expensive retraining. We introduce LessIsMore, a training-free sparse attention mechanism for reasoning tasks, which leverages global attention patterns rather than relying on traditional head-specific local optimizations. LessIsMore aggregates token selections from local attention heads with recent contextual information, enabling unified cross-head token ranking for future decoding layers. This unified selection improves generalization and efficiency by avoiding the need to maintain separate token subsets per head. Evaluation across diverse reasoning tasks and benchmarks shows that LessIsMore preserves-and in some cases improves-accuracy while achieving a 1.1× average decoding speed-up compared to full attention. Moreover, LessIsMore attends to 2× fewer tokens without accuracy loss, achieving a 1.13× end-to-end speed-up compared to existing sparse attention methods. 1",
+  "cited_papers": [
+    {
+      "id": "b0",
+      "title": "Keyformer: Kv cache reduction through key tokens selection for efficient generative inference",
+      "authors": [
+        "Muhammad Adnan",
+        "Akhil Arunkumar",
+        "Gaurav Jain",
+        "Prashant Nair",
+        "Ilya Soloveychik",
+        "Purushotham Kamath"
+      ],
+      "year": "2024",
+      "venue": "Keyformer: Kv cache reduction through key tokens selection for efficient generative inference",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b0\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_tg9Nkzn\">Keyformer: Kv cache reduction through key tokens selection for efficient generative inference</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Muhammad</forename><surname>Adnan</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Akhil</forename><surname>Arunkumar</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Gaurav</forename><surname>Jain</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Prashant</forename><forename type=\"middle\">J</forename><surname>Nair</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ilya</forename><surname>Soloveychik</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Purushotham</forename><surname>Kamath</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2403.09054\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "4c69d79c0ee7ac964284a75135b317d1ce7fb2d6",
+        "title": "Keyformer: KV Cache Reduction through Key Tokens Selection for Efficient Generative Inference",
+        "abstract": "Transformers have emerged as the underpinning architecture for Large Language Models (LLMs). In generative language models, the inference process involves two primary phases: prompt processing and token generation. Token generation, which constitutes the majority of the computational workload, primarily entails vector-matrix multiplications and interactions with the Key-Value (KV) Cache. This phase is constrained by memory bandwidth due to the overhead of transferring weights and KV cache values from the memory system to the computing units. This memory bottleneck becomes particularly pronounced in applications that require long-context and extensive text generation, both of which are increasingly crucial for LLMs. This paper introduces\"Keyformer\", an innovative inference-time approach, to mitigate the challenges associated with KV cache size and memory bandwidth utilization. Keyformer leverages the observation that approximately 90% of the attention weight in generative inference focuses on a specific subset of tokens, referred to as\"key\"tokens. Keyformer retains only the key tokens in the KV cache by identifying these crucial tokens using a novel score function. This approach effectively reduces both the KV cache size and memory bandwidth usage without compromising model accuracy. We evaluate Keyformer's performance across three foundational models: GPT-J, Cerebras-GPT, and MPT, which employ various positional embedding algorithms. Our assessment encompasses a variety of tasks, with a particular emphasis on summarization and conversation tasks involving extended contexts. Keyformer's reduction of KV cache reduces inference latency by 2.1x and improves token generation throughput by 2.4x, while preserving the model's accuracy.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-03-14",
+        "venue": "Conference on Machine Learning and Systems",
+        "year": "2024",
+        "citation_count": 82,
+        "novel": null,
+        "authors": "Muhammad Adnan, Akhil Arunkumar, Gaurav Jain, Prashant J. Nair, Ilya Soloveychik, Purushotham Kamath",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b1",
+      "title": "Llama 3.1: Advanced open-source language model",
+      "authors": [
+        "A Meta"
+      ],
+      "year": "2024",
+      "venue": "Llama 3.1: Advanced open-source language model",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b1\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_4r9BSZS\">Llama 3.1: Advanced open-source language model</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">A</forename><forename type=\"middle\">I</forename><surname>Meta</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://ai.meta.com/blog/meta-llama-3-1/\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t\t<biblScope unit=\"page\" from=\"2024\" to=\"2029\"/>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b2",
+      "title": "Aime problems and solutions",
+      "authors": [
+        "Aops"
+      ],
+      "year": "2025",
+      "venue": "Aime problems and solutions",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b2\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_n2sP4mb\">Aime problems and solutions</title>\n\t\t<author>\n\t\t\t<persName><surname>Aops</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://artofproblemsolving.com/wiki/index.php/AIME_Problems_and_Solutions\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t\t<biblScope unit=\"page\" from=\"2025\" to=\"2027\"/>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b3",
+      "title": "R-kv: Redundancy-aware kv cache compression for reasoning models",
+      "authors": [
+        "Zefan Cai",
+        "Wen Xiao",
+        "Hanshi Sun",
+        "Cheng Luo",
+        "Yikai Zhang",
+        "Ke Wan",
+        "Yucheng Li",
+        "Yeyang Zhou",
+        "Li-Wen Chang",
+        "Jiuxiang Gu",
+        "Zhen Dong",
+        "Anima Anandkumar",
+        "Abedelkadir Asi",
+        "Junjie Hu"
+      ],
+      "year": "2025",
+      "venue": "R-kv: Redundancy-aware kv cache compression for reasoning models",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b3\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_TrcbECs\">R-kv: Redundancy-aware kv cache compression for reasoning models</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zefan</forename><surname>Cai</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Wen</forename><surname>Xiao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hanshi</forename><surname>Sun</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Cheng</forename><surname>Luo</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yikai</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ke</forename><surname>Wan</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yucheng</forename><surname>Li</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yeyang</forename><surname>Zhou</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Li-Wen</forename><surname>Chang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jiuxiang</forename><surname>Gu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhen</forename><surname>Dong</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Anima</forename><surname>Anandkumar</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Abedelkadir</forename><surname>Asi</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Junjie</forename><surname>Hu</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2505.24133\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "48d73af1a5820c5c4fa56a7dc310ee6de7421a3f",
+        "title": "R-KV: Redundancy-aware KV Cache Compression for Reasoning Models",
+        "abstract": null,
+        "citations": [],
+        "embedding": null,
+        "publication_date": null,
+        "venue": "",
+        "year": null,
+        "citation_count": 1,
+        "novel": null,
+        "authors": "Zefan Cai, Wen Xiao, Hanshi Sun, Cheng Luo, Yikai Zhang, Ke Wan, Yucheng Li, Yeyang Zhou, Li-Wen Chang, Jiuxiang Gu, Zhen Dong, Anima Anandkumar, Abedelkadir Asi, Junjie Hu",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b4",
+      "title": "Magicpig: Lsh sampling for efficient llm generation",
+      "authors": [
+        "Zhuoming Chen",
+        "Ranajoy Sadhukhan",
+        "Zihao Ye",
+        "Yang Zhou",
+        "Jianyu Zhang",
+        "Niklas Nolte",
+        "Yuandong Tian",
+        "Matthijs Douze",
+        "Leon Bottou",
+        "Zhihao Jia",
+        "Beidi Chen"
+      ],
+      "year": "2024",
+      "venue": "Magicpig: Lsh sampling for efficient llm generation",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b4\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_rvZBtuV\">Magicpig: Lsh sampling for efficient llm generation</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhuoming</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ranajoy</forename><surname>Sadhukhan</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zihao</forename><surname>Ye</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yang</forename><surname>Zhou</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jianyu</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Niklas</forename><surname>Nolte</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuandong</forename><surname>Tian</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Matthijs</forename><surname>Douze</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Leon</forename><surname>Bottou</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhihao</forename><surname>Jia</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Beidi</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2410.16179\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "6027d9b7f875a42a36029e2d3b7308be6fa88bb1",
+        "title": "MagicPIG: LSH Sampling for Efficient LLM Generation",
+        "abstract": "Large language models (LLMs) with long context windows have gained significant attention. However, the KV cache, stored to avoid re-computation, becomes a bottleneck. Various dynamic sparse or TopK-based attention approximation methods have been proposed to leverage the common insight that attention is sparse. In this paper, we first show that TopK attention itself suffers from quality degradation in certain downstream tasks because attention is not always as sparse as expected. Rather than selecting the keys and values with the highest attention scores, sampling with theoretical guarantees can provide a better estimation for attention output. To make the sampling-based approximation practical in LLM generation, we propose MagicPIG, a heterogeneous system based on Locality Sensitive Hashing (LSH). MagicPIG significantly reduces the workload of attention computation while preserving high accuracy for diverse tasks. MagicPIG stores the LSH hash tables and runs the attention computation on the CPU, which allows it to serve longer contexts and larger batch sizes with high approximation accuracy. MagicPIG can improve decoding throughput by up to $5\\times$ across various GPU hardware and achieve 54ms decoding latency on a single RTX 4090 for Llama-3.1-8B-Instruct model with a context of 96k tokens. The code is available at https://github.com/Infini-AI-Lab/MagicPIG.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-10-21",
+        "venue": "International Conference on Learning Representations",
+        "year": "2024",
+        "citation_count": 40,
+        "novel": null,
+        "authors": "Zhuoming Chen, Ranajoy Sadhukhan, Zihao Ye, Yang Zhou, Jianyu Zhang, Niklas Nolte, Yuandong Tian, Matthijs Douze, Léon Bottou, Zhihao Jia, Beidi Chen",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b5",
+      "title": "Gemini 2.5: Our most intelligent ai model",
+      "authors": [
+        "Google Deepmind"
+      ],
+      "year": "2025",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b5\">\n\t<monogr>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Google</forename><surname>Deepmind</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/\"/>\n\t\t<title level=\"m\" xml:id=\"_e63sKFW\">Gemini 2.5: Our most intelligent ai model</title>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025-03\">March 2025</date>\n\t\t\t<biblScope unit=\"page\" from=\"2025\" to=\"2027\"/>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b6",
+      "title": "Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning",
+      "authors": [
+        "Deepseek-Ai"
+      ],
+      "year": "2025",
+      "venue": "Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b6\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_h58zEVx\">Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Deepseek-Ai</forename></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2501.12948\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "34471a2fa18ea22efad5287cf4aeb18542c98a9b",
+        "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        "abstract": "We introduce our first-generation reasoning models, DeepSeek-R1-Zero and DeepSeek-R1. DeepSeek-R1-Zero, a model trained via large-scale reinforcement learning (RL) without supervised fine-tuning (SFT) as a preliminary step, demonstrates remarkable reasoning capabilities. Through RL, DeepSeek-R1-Zero naturally emerges with numerous powerful and intriguing reasoning behaviors. However, it encounters challenges such as poor readability, and language mixing. To address these issues and further enhance reasoning performance, we introduce DeepSeek-R1, which incorporates multi-stage training and cold-start data before RL. DeepSeek-R1 achieves performance comparable to OpenAI-o1-1217 on reasoning tasks. To support the research community, we open-source DeepSeek-R1-Zero, DeepSeek-R1, and six dense models (1.5B, 7B, 8B, 14B, 32B, 70B) distilled from DeepSeek-R1 based on Qwen and Llama.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-01-22",
+        "venue": "arXiv.org",
+        "year": "2025",
+        "citation_count": 3517,
+        "novel": null,
+        "authors": "DeepSeek-AI, Daya Guo, Dejian Yang, Haowei Zhang, Jun-Mei Song, Ruoyu Zhang, R. Xu, Qihao Zhu, Shirong Ma, Peiyi Wang, Xiaoling Bi, Xiaokang Zhang, Xingkai Yu, Yu Wu, Z. F. Wu, Zhibin Gou, Zhihong Shao, Zhuoshu Li, Ziyi Gao, A. Liu, Bing Xue, Bing-Li Wang, Bochao Wu, Bei Feng, Chengda Lu, Chenggang Zhao, C. Deng, Chenyu Zhang, C. Ruan, Damai Dai, Deli Chen, Dong-Li Ji, Erhang Li, Fangyun Lin, Fucong Dai, Fuli Luo, Guangbo Hao, Guanting Chen, Guowei Li, H. Zhang, Han Bao, Hanwei Xu, Haocheng Wang, Honghui Ding, Huajian Xin, Huazuo Gao, Hui Qu, Hui Li, Jianzhong Guo, Jiashi Li, Jiawei Wang, Jingchang Chen, Jingyang Yuan, Junjie Qiu, Junlong Li, J. Cai, J. Ni, Jian Liang, Jin Chen, Kai Dong, Kai Hu, Kaige Gao, Kang Guan, Kexin Huang, K. Yu, Lean Wang, Lecong Zhang, Liang Zhao, Litong Wang, Liyue Zhang, Lei Xu, Leyi Xia, Mingchuan Zhang, Minghua Zhang, M. Tang, Meng Li, Miaojun Wang, Mingming Li, Ning Tian, Panpan Huang, Peng Zhang, Qiancheng Wang, Qinyu Chen, Qiushi Du, Ruiqi Ge, Ruisong Zhang, Ruizhe Pan, Runji Wang, R. J. Chen, R. Jin, Ruyi Chen, Shanghao Lu, Shangyan Zhou, Shanhuang Chen, Shengfeng Ye, Shiyu Wang, Shuiping Yu, Shunfeng Zhou, Shuting Pan, S. S. Li, Shuang Zhou, Shao-Kang Wu, Tao Yun, Tian Pei, T. Sun, T. Wang, Wangding Zeng, Wanjia Zhao, Wen Liu, W. Liang, Wenjun Gao, Wen-Xia Yu, Wentao Zhang, W. Xiao, Wei An, Xiaodong Liu, Xiaohan Wang, Xiaokang Chen, X. Nie, Xin Cheng, Xin Liu, Xin Xie, Xingchao Liu, Xinyu Yang, Xinyuan Li, Xuecheng Su, Xuheng Lin, X. Q. Li, Xiangyu Jin, Xi-Cheng Shen, Xiaosha Chen, Xiaowen Sun, Xiaoxiang Wang, Xinnan Song, Xinyi Zhou, Xianzu Wang, Xinxia Shan, Y. K. Li, Y. Q. Wang, Y. X. Wei, Yang Zhang, Yanhong Xu, Yao Li, Yao Zhao, Yaofeng Sun, Yaohui Wang, Yi Yu, Yichao Zhang, Yifan Shi, Yi Xiong, Ying He, Yishi Piao, Yisong Wang, Yixuan Tan, Yiyang Ma, Yiyuan Liu, Yongqiang Guo, Yuan Ou, Yuduan Wang, Yue Gong, Yu-Jing Zou, Yujia He, Yunfan Xiong, Yu-Wei Luo, Yu-mei You, Yuxuan Liu, Yuyang Zhou, Y. X. Zhu, Yanping Huang, Yao Li, Yi Zheng, Yuchen Zhu, Yunxiang Ma, Ying Tang, Yukun Zha, Yuting Yan, Z. Ren, Z. Ren, Zhangli Sha, Zhe Fu, Zhean Xu, Zhenda Xie, Zhen-guo Zhang, Zhewen Hao, Zhicheng Ma, Zhigang Yan, Zhiyu Wu, Zihui Gu, Zijia Zhu, Zijun Liu, Zi-An Li, Ziwei Xie, Ziyang Song, Zizheng Pan, Zhen Huang, Zhipeng Xu, Zhongyu Zhang, Zhen Zhang",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b7",
+      "title": "Hymba: A hybridhead architecture for small language models",
+      "authors": [
+        "Xin Dong",
+        "Yonggan Fu",
+        "Shizhe Diao",
+        "Wonmin Byeon",
+        "Zijia Chen",
+        "Ameya Sunil Mahabaleshwarkar",
+        "Shih-Yang Liu",
+        "Matthijs Van Keirsbilck",
+        "Min-Hung Chen",
+        "Yoshi Suhara"
+      ],
+      "year": "2024",
+      "venue": "Hymba: A hybridhead architecture for small language models",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b7\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_WDMVWW2\">Hymba: A hybridhead architecture for small language models</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Xin</forename><surname>Dong</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yonggan</forename><surname>Fu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Shizhe</forename><surname>Diao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Wonmin</forename><surname>Byeon</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zijia</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ameya</forename><surname>Sunil Mahabaleshwarkar</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Shih-Yang</forename><surname>Liu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Matthijs</forename><surname>Van Keirsbilck</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Min-Hung</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yoshi</forename><surname>Suhara</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2411.13676\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b8",
+      "title": "Seerattention-r: Sparse attention adaptation for long reasoning",
+      "authors": [
+        "Yizhao Gao",
+        "Shuming Guo",
+        "Shijie Cao",
+        "Yuqing Xia",
+        "Yu Cheng",
+        "Lei Wang",
+        "Lingxiao Ma",
+        "Yutao Sun",
+        "Tianzhu Ye",
+        "Li Dong",
+        "Hayden Kwok-Hay",
+        "Yu So",
+        "Ting Hua",
+        "Fan Cao",
+        "Mao Yang",
+        "Yang"
+      ],
+      "year": "2025",
+      "venue": "Seerattention-r: Sparse attention adaptation for long reasoning",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b8\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_vAKjmGB\">Seerattention-r: Sparse attention adaptation for long reasoning</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yizhao</forename><surname>Gao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Shuming</forename><surname>Guo</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Shijie</forename><surname>Cao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuqing</forename><surname>Xia</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yu</forename><surname>Cheng</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lei</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lingxiao</forename><surname>Ma</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yutao</forename><surname>Sun</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tianzhu</forename><surname>Ye</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Li</forename><surname>Dong</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hayden</forename><surname>Kwok-Hay</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yu</forename><surname>So</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ting</forename><surname>Hua</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Fan</forename><surname>Cao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Mao</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2506.08889\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "04b2f3d742f33c372df81d8af2ea34c8fec629fb",
+        "title": "SeerAttention-R: Sparse Attention Adaptation for Long Reasoning",
+        "abstract": "We introduce SeerAttention-R, a sparse attention framework specifically tailored for the long decoding of reasoning models. Extended from SeerAttention, SeerAttention-R retains the design of learning attention sparsity through a self-distilled gating mechanism, while removing query pooling to accommodate auto-regressive decoding. With a lightweight plug-in gating, SeerAttention-R is flexible and can be easily integrated into existing pretrained model without modifying the original parameters. We demonstrate that SeerAttention-R, trained on just 0.4B tokens, maintains near-lossless reasoning accuracy with 4K token budget in AIME benchmark under large sparse attention block sizes (64/128). Using TileLang, we develop a highly optimized sparse decoding kernel that achieves near-theoretical speedups of up to 9x over FlashAttention-3 on H100 GPU at 90% sparsity. Code is available at: https://github.com/microsoft/SeerAttention.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-06-10",
+        "venue": "arXiv.org",
+        "year": "2025",
+        "citation_count": 4,
+        "novel": null,
+        "authors": "Yizhao Gao, Shuming Guo, Shijie Cao, Yuqing Xia, Yu Cheng, Lei Wang, Lingxiao Ma, Yutao Sun, Tianzhu Ye, Li Dong, Hayden Kwok-Hay So, Yu Hua, Ting Cao, Fan Yang, Mao Yang",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b9",
+      "title": "Om-niKV: Dynamic context selection for efficient long-context LLMs",
+      "authors": [
+        "Jitai Preprint",
+        "Yuke Hao",
+        "Tian Zhu",
+        "Jun Wang",
+        "Xin Yu",
+        "Bo Xin",
+        "Zhaochun Zheng",
+        "Sheng Ren",
+        "Guo"
+      ],
+      "year": "2025",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b9\">\n\t<analytic>\n\t\t<title level=\"a\" type=\"main\" xml:id=\"_ezbxbq3\">Om-niKV: Dynamic context selection for efficient long-context LLMs</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jitai</forename><surname>Preprint</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuke</forename><surname>Hao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tian</forename><surname>Zhu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jun</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Xin</forename><surname>Yu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Bo</forename><surname>Xin</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhaochun</forename><surname>Zheng</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Sheng</forename><surname>Ren</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><surname>Guo</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://openreview.net/forum?id=ulCAPXYXfa\"/>\n\t</analytic>\n\t<monogr>\n\t\t<title level=\"m\" xml:id=\"_mbThX99\">The Thirteenth International Conference on Learning Representations</title>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "bd6f57cfd1d597fc107995df36601ec969d329a2",
+        "title": "OmniKV: Dynamic Context Selection for Efficient Long-Context LLMs",
+        "abstract": null,
+        "citations": [],
+        "embedding": null,
+        "publication_date": null,
+        "venue": "International Conference on Learning Representations",
+        "year": "2025",
+        "citation_count": 10,
+        "novel": null,
+        "authors": "Jitai Hao, Yuke Zhu, Tian Wang, Jun Yu, Xin Xin, Bo Zheng, Zhaochun Ren, Sheng Guo",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b10",
+      "title": "Evaluating step-by-step reasoning traces: A survey",
+      "authors": [
+        "Jinu Lee",
+        "Julia Hockenmaier"
+      ],
+      "year": "2025",
+      "venue": "Evaluating step-by-step reasoning traces: A survey",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b10\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_fFg7reP\">Evaluating step-by-step reasoning traces: A survey</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jinu</forename><surname>Lee</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Julia</forename><surname>Hockenmaier</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2502.12289\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "d25b7c6e30725feaac3d28b584653cf61d50c5ad",
+        "title": "Evaluating Step-by-step Reasoning Traces: A Survey",
+        "abstract": "Step-by-step reasoning is widely used to enhance the reasoning ability of large language models (LLMs) in complex problems. Evaluating the quality of reasoning traces is crucial for understanding and improving LLM reasoning. However, existing evaluation practices are highly inconsistent, resulting in fragmented progress across evaluator design and benchmark development. To address this gap, this survey provides a comprehensive overview of step-by-step reasoning evaluation, proposing a taxonomy of evaluation criteria with four top-level categories (factuality, validity, coherence, and utility). Based on the taxonomy, we review different datasets, evaluator implementations, and recent findings, leading to promising directions for future research.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-02-17",
+        "venue": "arXiv.org",
+        "year": "2025",
+        "citation_count": 9,
+        "novel": null,
+        "authors": "Jinu Lee, J. Hockenmaier",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b11",
+      "title": "Snapkv: Llm knows what you are looking for before generation",
+      "authors": [
+        "Yuhong Li",
+        "Yingbing Huang",
+        "Bowen Yang",
+        "Bharat Venkitesh",
+        "Acyr Locatelli",
+        "Hanchen Ye",
+        "Tianle Cai",
+        "Patrick Lewis",
+        "Deming Chen"
+      ],
+      "year": "2024",
+      "venue": "Snapkv: Llm knows what you are looking for before generation",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b11\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_TqVPXky\">Snapkv: Llm knows what you are looking for before generation</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuhong</forename><surname>Li</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yingbing</forename><surname>Huang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Bowen</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Bharat</forename><surname>Venkitesh</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Acyr</forename><surname>Locatelli</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hanchen</forename><surname>Ye</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tianle</forename><surname>Cai</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Patrick</forename><surname>Lewis</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Deming</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2404.14469\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "1784c987e681d60c634765fe64c8d9c26f73d5ff",
+        "title": "SnapKV: LLM Knows What You are Looking for Before Generation",
+        "abstract": "Large Language Models (LLMs) have made remarkable progress in processing extensive contexts, with the Key-Value (KV) cache playing a vital role in enhancing their performance. However, the growth of the KV cache in response to increasing input length poses challenges to memory and time efficiency. To address this problem, this paper introduces SnapKV, an innovative and fine-tuning-free approach that efficiently minimizes KV cache size while still delivering comparable performance in real-world applications. We discover that each attention head in the model consistently focuses on specific prompt attention features during generation. Meanwhile, this robust pattern can be obtained from an 'observation' window located at the end of the prompts. Drawing on this insight, SnapKV automatically compresses KV caches by selecting clustered important KV positions for each attention head. Our approach significantly reduces the growing computational overhead and memory footprint when processing long input sequences. Specifically, SnapKV achieves a consistent decoding speed with a 3.6x increase in generation speed and an 8.2x enhancement in memory efficiency compared to the baseline when processing inputs of 16K tokens. At the same time, it maintains comparable performance to the baseline models across 16 long sequence datasets. Moreover, SnapKV can process up to 380K context tokens on a single A100-80GB GPU using HuggingFace implementation with minor changes, exhibiting only a negligible accuracy drop in the Needle-in-a-Haystack test. Further comprehensive studies suggest SnapKV's potential for practical applications.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-04-22",
+        "venue": "Neural Information Processing Systems",
+        "year": "2024",
+        "citation_count": 274,
+        "novel": null,
+        "authors": "Yuhong Li, Yingbing Huang, Bowen Yang, Bharat Venkitesh, Acyr F. Locatelli, Hanchen Ye, Tianle Cai, Patrick Lewis, Deming Chen",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b12",
+      "title": "Twilight: Adaptive attention sparsity with hierarchical top-p pruning",
+      "authors": [
+        "Chaofan Lin",
+        "Jiaming Tang",
+        "Shuo Yang",
+        "Hanshuo Wang",
+        "Tian Tang",
+        "Boyu Tian",
+        "Ion Stoica",
+        "Song Han",
+        "Mingyu Gao"
+      ],
+      "year": "2025",
+      "venue": "Twilight: Adaptive attention sparsity with hierarchical top-p pruning",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b12\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_4hupsUx\">Twilight: Adaptive attention sparsity with hierarchical top-p pruning</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Chaofan</forename><surname>Lin</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jiaming</forename><surname>Tang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Shuo</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hanshuo</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tian</forename><surname>Tang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Boyu</forename><surname>Tian</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ion</forename><surname>Stoica</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Song</forename><surname>Han</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Mingyu</forename><surname>Gao</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2502.02770\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "3b430f665a04e8ccc5fac30ff39b42d4c6cc893d",
+        "title": "Twilight: Adaptive Attention Sparsity with Hierarchical Top-p Pruning",
+        "abstract": "Leveraging attention sparsity to accelerate long-context large language models (LLMs) has been a hot research topic. However, current algorithms such as sparse attention or key-value (KV) cache compression tend to use a fixed budget, which presents a significant challenge during deployment because it fails to account for the dynamic nature of real-world scenarios, where the optimal balance between accuracy and efficiency can vary greatly. In this paper, we find that borrowing top-$p$ sampling (nucleus sampling) to sparse attention can surprisingly achieve adaptive budgeting. Based on this, we propose Twilight, a framework to bring adaptive sparsity to any existing sparse attention algorithm without sacrificing their accuracy. Empirical results show that Twilight can adaptively prune at most 98% of redundant tokens, leading to $15.4\\times$ acceleration in self-attention operations and $3.9\\times$ acceleration in end-to-end per token latency in long context LLM decoding.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-02-04",
+        "venue": "arXiv.org",
+        "year": "2025",
+        "citation_count": 5,
+        "novel": null,
+        "authors": "Chaofan Lin, Jiaming Tang, Shuo Yang, Hanshuo Wang, Tian Tang, Boyu Tian, Ion Stoica, Song Han, Mingyu Gao",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b13",
+      "title": "Retrievalattention: Accelerating long-context llm inference via vector retrieval",
+      "authors": [
+        "Di Liu",
+        "Meng Chen",
+        "Baotong Lu",
+        "Huiqiang Jiang",
+        "Zhenhua Han",
+        "Qianxi Zhang",
+        "Qi Chen",
+        "Chengruidong Zhang",
+        "Bailu Ding",
+        "Kai Zhang",
+        "Chen Chen",
+        "Fan Yang",
+        "Yuqing Yang",
+        "Lili Qiu"
+      ],
+      "year": "2024",
+      "venue": "Retrievalattention: Accelerating long-context llm inference via vector retrieval",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b13\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_9Vm5WSB\">Retrievalattention: Accelerating long-context llm inference via vector retrieval</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Di</forename><surname>Liu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Meng</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Baotong</forename><surname>Lu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Huiqiang</forename><surname>Jiang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhenhua</forename><surname>Han</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Qianxi</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Qi</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Chengruidong</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Bailu</forename><surname>Ding</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Kai</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Chen</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Fan</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuqing</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lili</forename><surname>Qiu</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2409.10516\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "61166a7545c7cadb1ec79c4744c348bac7644d41",
+        "title": "RetrievalAttention: Accelerating Long-Context LLM Inference via Vector Retrieval",
+        "abstract": "Transformer-based Large Language Models (LLMs) have become increasingly important. However, due to the quadratic time complexity of attention computation, scaling LLMs to longer contexts incurs extremely slow inference speed and high GPU memory consumption for caching key-value (KV) vectors. This paper proposes RetrievalAttention, a training-free approach to both accelerate attention computation and reduce GPU memory consumption. By leveraging the dynamic sparsity of attention mechanism, RetrievalAttention proposes to build approximate nearest neighbor search (ANNS) indexes for KV vectors in CPU memory and retrieve the most relevant ones through vector search during generation. Unfortunately, we observe that the off-the-shelf ANNS indexes are often ineffective for such retrieval tasks due to the out-of-distribution (OOD) between query vectors and key vectors in the attention mechanism. RetrievalAttention addresses the OOD challenge by designing an attention-aware vector search algorithm that can adapt to the distribution of query vectors. Our evaluation demonstrates that RetrievalAttention achieves near full attention accuracy while only requiring access to 1--3% of the data. This leads to a significant reduction in the inference cost of long-context LLMs, with a much lower GPU memory footprint. In particular, RetrievalAttention only needs a single NVIDIA RTX4090 (24GB) to serve 128K tokens for LLMs with 8B parameters, which is capable of generating one token in 0.188 seconds.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-09-16",
+        "venue": "arXiv.org",
+        "year": "2024",
+        "citation_count": 61,
+        "novel": null,
+        "authors": "Di Liu, Meng Chen, Baotong Lu, Huiqiang Jiang, Zhenhua Han, Qianxi Zhang, Qi Chen, Chengruidong Zhang, Bailu Ding, Kai Zhang, Chen Chen, Fan Yang, Yuqing Yang, Lili Qiu",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b14",
+      "title": "Efficient inference for large reasoning models: A survey",
+      "authors": [
+        "Yue Liu",
+        "Jiaying Wu",
+        "Yufei He",
+        "Hongcheng Gao",
+        "Hongyu Chen",
+        "Baolong Bi",
+        "Ruihan Gong",
+        "Jiaheng Zhang",
+        "Zhiqi Huang",
+        "Bryan Hooi"
+      ],
+      "year": "2025",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b14\">\n\t<monogr>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yue</forename><surname>Liu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jiaying</forename><surname>Wu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yufei</forename><surname>He</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hongcheng</forename><surname>Gao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hongyu</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Baolong</forename><surname>Bi</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ruihan</forename><surname>Gong</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jiaheng</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhiqi</forename><surname>Huang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Bryan</forename><surname>Hooi</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2503.23077\"/>\n\t\t<title level=\"m\" xml:id=\"_Km9DHQu\">Efficient inference for large reasoning models: A survey</title>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "2f066326c0d5e5ecd7dc646224272f1e13948579",
+        "title": "Efficient Inference for Large Reasoning Models: A Survey",
+        "abstract": "Large Reasoning Models (LRMs) significantly improve the reasoning ability of Large Language Models (LLMs) by learning to reason, exhibiting promising performance in solving complex tasks. However, their deliberative reasoning process leads to inefficiencies in token usage, memory consumption, and inference time. Thus, this survey provides a review of efficient inference methods designed specifically for LRMs, focusing on mitigating token inefficiency while preserving the reasoning quality. The overview structure of this paper is shown in Figure~\\ref{fig:paper_structure}. First, we introduce a taxonomy to group the recent methods into two main categories: (a) explicit compact Chain-of-Thought (CoT), which reduces tokens while keeping the explicit reasoning structure, and (b) implicit latent CoT, which encodes reasoning steps within hidden representations instead of explicit tokens. Meanwhile, we discuss their strengths and weaknesses. Then, we conduct empirical analyses on existing methods from reasoning scenarios, object functions, and performance \\&efficiency aspects. Besides, we present open challenges in this field, including human-centric controllable reasoning, trade-off between interpretability and efficiency of reasoning, ensuring the safety of efficient reasoning, and broader applications of efficient reasoning. In addition, we highlight key insights for enhancing LRMs'inference efficiency via techniques such as model merging, new architectures, and agent routers. We hope this work serves as a valuable guide, helping researchers overcome challenges in this vibrant field. A collection of efficient reasoning methods for LRMs (papers and codes) is provided at this link: https://github.com/yueliu1999/Awesome-Efficient-Inference-for-LRMs.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-03-29",
+        "venue": "arXiv.org",
+        "year": "2025",
+        "citation_count": 31,
+        "novel": null,
+        "authors": "Yue Liu, Jiaying Wu, Yufei He, Hongcheng Gao, Hongyu Chen, Baolong Bi, Jiaheng Zhang, Zhiqi Huang, Bryan Hooi",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b15",
+      "title": "Introducing gpt-oss",
+      "authors": [],
+      "year": "2025",
+      "venue": "Introducing gpt-oss",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b15\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_YGpu8Db\">Introducing gpt-oss</title>\n\t\t<ptr target=\"https://openai.com/index/introducing-gpt-oss/\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t\t<respStmt>\n\t\t\t<orgName>OpenAI</orgName>\n\t\t</respStmt>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b16",
+      "title": "",
+      "authors": [
+        "Openai"
+      ],
+      "year": "2025",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b16\">\n\t<monogr>\n\t\t<title/>\n\t\t<author>\n\t\t\t<persName><surname>Openai</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://openai.com/index/introducing-o3-and-o4-mini/\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025-04\">April 2025</date>\n\t\t\t<biblScope unit=\"page\" from=\"2025\" to=\"2027\"/>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n"
+    },
+    {
+      "id": "b17",
+      "title": "Gpqa: A graduate-level google-proof q&a benchmark",
+      "authors": [
+        "David Rein",
+        "Betty Hou",
+        "Asa Stickland",
+        "Jackson Petty",
+        "Richard Pang",
+        "Julien Dirani",
+        "Julian Michael",
+        "Samuel Bowman"
+      ],
+      "year": "2023",
+      "venue": "Gpqa: A graduate-level google-proof q&a benchmark",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b17\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_NnTR54Y\">Gpqa: A graduate-level google-proof q&amp;a benchmark</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">David</forename><surname>Rein</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Betty</forename><forename type=\"middle\">Li</forename><surname>Hou</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Asa</forename><forename type=\"middle\">Cooper</forename><surname>Stickland</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jackson</forename><surname>Petty</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Richard</forename><forename type=\"middle\">Yuanzhe</forename><surname>Pang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Julien</forename><surname>Dirani</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Julian</forename><surname>Michael</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Samuel</forename><forename type=\"middle\">R</forename><surname>Bowman</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2311.12022\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2023\">2023</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "210b0a3d76e93079cc51b03c4115fde545eea966",
+        "title": "GPQA: A Graduate-Level Google-Proof Q&A Benchmark",
+        "abstract": "We present GPQA, a challenging dataset of 448 multiple-choice questions written by domain experts in biology, physics, and chemistry. We ensure that the questions are high-quality and extremely difficult: experts who have or are pursuing PhDs in the corresponding domains reach 65% accuracy (74% when discounting clear mistakes the experts identified in retrospect), while highly skilled non-expert validators only reach 34% accuracy, despite spending on average over 30 minutes with unrestricted access to the web (i.e., the questions are\"Google-proof\"). The questions are also difficult for state-of-the-art AI systems, with our strongest GPT-4 based baseline achieving 39% accuracy. If we are to use future AI systems to help us answer very hard questions, for example, when developing new scientific knowledge, we need to develop scalable oversight methods that enable humans to supervise their outputs, which may be difficult even if the supervisors are themselves skilled and knowledgeable. The difficulty of GPQA both for skilled non-experts and frontier AI systems should enable realistic scalable oversight experiments, which we hope can help devise ways for human experts to reliably get truthful information from AI systems that surpass human capabilities.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2023-11-20",
+        "venue": "arXiv.org",
+        "year": "2023",
+        "citation_count": 1096,
+        "novel": null,
+        "authors": "David Rein, Betty Li Hou, Asa Cooper Stickland, Jackson Petty, Richard Yuanzhe Pang, Julien Dirani, Julian Michael, Samuel R. Bowman",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b18",
+      "title": "Open reasoning tasks: Llm reasoning tasks collection",
+      "authors": [],
+      "year": "2024",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b18\">\n\t<analytic>\n\t\t<title level=\"a\" type=\"main\" xml:id=\"_r7wWZKp\">Open reasoning tasks: Llm reasoning tasks collection</title>\n\t\t<ptr target=\"https://github.com/NousResearch/Open-Reasoning-Tasks\"/>\n\t</analytic>\n\t<monogr>\n\t\t<title level=\"j\" xml:id=\"_kJMwqBT\">Nous Research</title>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b19",
+      "title": "Quest: Query-aware sparsity for efficient long-context llm inference",
+      "authors": [
+        "Jiaming Tang",
+        "Yilong Zhao",
+        "Kan Zhu",
+        "Guangxuan Xiao",
+        "Baris Kasikci",
+        "Song Han"
+      ],
+      "year": "2024",
+      "venue": "Quest: Query-aware sparsity for efficient long-context llm inference",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b19\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_eC9XdpM\">Quest: Query-aware sparsity for efficient long-context llm inference</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jiaming</forename><surname>Tang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yilong</forename><surname>Zhao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Kan</forename><surname>Zhu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Guangxuan</forename><surname>Xiao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Baris</forename><surname>Kasikci</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Song</forename><surname>Han</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2406.10774\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "1c7db9fb18246787fbe3de6e0eaa370ae749e795",
+        "title": "Quest: Query-Aware Sparsity for Efficient Long-Context LLM Inference",
+        "abstract": "As the demand for long-context large language models (LLMs) increases, models with context windows of up to 128K or 1M tokens are becoming increasingly prevalent. However, long-context LLM inference is challenging since the inference speed decreases significantly as the sequence length grows. This slowdown is primarily caused by loading a large KV cache during self-attention. Previous works have shown that a small portion of critical tokens will dominate the attention outcomes. However, we observe the criticality of a token highly depends on the query. To this end, we propose Quest, a query-aware KV cache selection algorithm. Quest keeps track of the minimal and maximal Key values in KV cache pages and estimates the criticality of a given page using Query vectors. By only loading the Top-K critical KV cache pages for attention, Quest significantly speeds up self-attention without sacrificing accuracy. We show that Quest can achieve up to 2.23x self-attention speedup, which reduces inference latency by 7.03x while performing well on tasks with long dependencies with negligible accuracy loss. Code is available at http://github.com/mit-han-lab/Quest .",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-06-16",
+        "venue": "International Conference on Machine Learning",
+        "year": "2024",
+        "citation_count": 153,
+        "novel": null,
+        "authors": "Jiaming Tang, Yilong Zhao, Kan Zhu, Guangxuan Xiao, Baris Kasikci, Song Han",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b20",
+      "title": "Qwen3 technical report",
+      "authors": [
+        "Qwen Team"
+      ],
+      "year": "2025",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b20\">\n\t<monogr>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Qwen</forename><surname>Team</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2505.09388\"/>\n\t\t<title level=\"m\" xml:id=\"_yeguAM2\">Qwen3 technical report</title>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "d2d84d56f730f81d276a02b48d5d44db5bde0b4a",
+        "title": "Qwen3 Technical Report",
+        "abstract": "In this work, we present Qwen3, the latest version of the Qwen model family. Qwen3 comprises a series of large language models (LLMs) designed to advance performance, efficiency, and multilingual capabilities. The Qwen3 series includes models of both dense and Mixture-of-Expert (MoE) architectures, with parameter scales ranging from 0.6 to 235 billion. A key innovation in Qwen3 is the integration of thinking mode (for complex, multi-step reasoning) and non-thinking mode (for rapid, context-driven responses) into a unified framework. This eliminates the need to switch between different models--such as chat-optimized models (e.g., GPT-4o) and dedicated reasoning models (e.g., QwQ-32B)--and enables dynamic mode switching based on user queries or chat templates. Meanwhile, Qwen3 introduces a thinking budget mechanism, allowing users to allocate computational resources adaptively during inference, thereby balancing latency and performance based on task complexity. Moreover, by leveraging the knowledge from the flagship models, we significantly reduce the computational resources required to build smaller-scale models, while ensuring their highly competitive performance. Empirical evaluations demonstrate that Qwen3 achieves state-of-the-art results across diverse benchmarks, including tasks in code generation, mathematical reasoning, agent tasks, etc., competitive against larger MoE models and proprietary models. Compared to its predecessor Qwen2.5, Qwen3 expands multilingual support from 29 to 119 languages and dialects, enhancing global accessibility through improved cross-lingual understanding and generation capabilities. To facilitate reproducibility and community-driven research and development, all Qwen3 models are publicly accessible under Apache 2.0.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-05-14",
+        "venue": "arXiv.org",
+        "year": "2025",
+        "citation_count": 808,
+        "novel": null,
+        "authors": "An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, Chujie Zheng, Dayiheng Liu, Fan Zhou, Fei Huang, Feng Hu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxin Yang, Jingren Zhou, Jingren Zhou, Junyan Lin, Kai Dang, Keqin Bao, Ke‐Pei Yang, Le Yu, Li-Chun Deng, Mei Li, Min Xue, Mingze Li, Pei Zhang, Peng Wang, Qin Zhu, Rui Men, Ruize Gao, Shi-Qiang Liu, Shuang Luo, Tianhao Li, Tianyi Tang, Wenbiao Yin, Xingzhang Ren, Xinyu Wang, Xinyu Zhang, Xuancheng Ren, Yang Fan, Yang Su, Yi-Chao Zhang, Yinger Zhang, Yu Wan, Yuqiong Liu, Zekun Wang, Zeyu Cui, Zhenru Zhang, Zhipeng Zhou, Zihan Qiu",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b21",
+      "title": "Edouard Grave, and Guillaume Lample. Llama: Open and efficient foundation language models",
+      "authors": [
+        "Hugo Touvron",
+        "Thibaut Lavril",
+        "Gautier Izacard",
+        "Xavier Martinet",
+        "Marie-Anne Lachaux",
+        "Timothée Lacroix",
+        "Baptiste Rozière",
+        "Naman Goyal",
+        "Eric Hambro",
+        "Faisal Azhar",
+        "Aurelien Rodriguez",
+        "Armand Joulin"
+      ],
+      "year": "2023",
+      "venue": "Edouard Grave, and Guillaume Lample. Llama: Open and efficient foundation language models",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b21\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_JamQjys\">Edouard Grave, and Guillaume Lample. Llama: Open and efficient foundation language models</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Hugo</forename><surname>Touvron</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Thibaut</forename><surname>Lavril</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Gautier</forename><surname>Izacard</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Xavier</forename><surname>Martinet</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Marie-Anne</forename><surname>Lachaux</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Timothée</forename><surname>Lacroix</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Baptiste</forename><surname>Rozière</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Naman</forename><surname>Goyal</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Eric</forename><surname>Hambro</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Faisal</forename><surname>Azhar</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Aurelien</forename><surname>Rodriguez</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Armand</forename><surname>Joulin</surname></persName>\n\t\t</author>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2023\">2023</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b22",
+      "title": "Chain-of-thought prompting elicits reasoning in large language models",
+      "authors": [
+        "Jason Wei",
+        "Xuezhi Wang",
+        "Dale Schuurmans",
+        "Maarten Bosma",
+        "Brian Ichter",
+        "Fei Xia",
+        "Ed Chi",
+        "Quoc Le",
+        "Denny Zhou"
+      ],
+      "year": "2023",
+      "venue": "Chain-of-thought prompting elicits reasoning in large language models",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b22\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_5xZYSnS\">Chain-of-thought prompting elicits reasoning in large language models</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jason</forename><surname>Wei</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Xuezhi</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Dale</forename><surname>Schuurmans</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Maarten</forename><surname>Bosma</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Brian</forename><surname>Ichter</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Fei</forename><surname>Xia</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ed</forename><surname>Chi</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Quoc</forename><surname>Le</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Denny</forename><surname>Zhou</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2201.11903\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2023\">2023</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "1b6e810ce0afd0dd093f789d2b2742d047e316d5",
+        "title": "Chain of Thought Prompting Elicits Reasoning in Large Language Models",
+        "abstract": "We explore how generating a chain of thought -- a series of intermediate reasoning steps -- significantly improves the ability of large language models to perform complex reasoning. In particular, we show how such reasoning abilities emerge naturally in sufficiently large language models via a simple method called chain of thought prompting, where a few chain of thought demonstrations are provided as exemplars in prompting. Experiments on three large language models show that chain of thought prompting improves performance on a range of arithmetic, commonsense, and symbolic reasoning tasks. The empirical gains can be striking. For instance, prompting a 540B-parameter language model with just eight chain of thought exemplars achieves state of the art accuracy on the GSM8K benchmark of math word problems, surpassing even finetuned GPT-3 with a verifier.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2022-01-28",
+        "venue": "Neural Information Processing Systems",
+        "year": "2022",
+        "citation_count": 11679,
+        "novel": null,
+        "authors": "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Ed H. Chi, F. Xia, Quoc Le, Denny Zhou",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b23",
+      "title": "Efficient streaming language models with attention sinks",
+      "authors": [
+        "Guangxuan Xiao",
+        "Yuandong Tian",
+        "Beidi Chen",
+        "Song Han",
+        "Mike Lewis"
+      ],
+      "year": "2023",
+      "venue": null,
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b23\">\n\t<analytic>\n\t\t<title level=\"a\" type=\"main\" xml:id=\"_GP6FU6u\">Efficient streaming language models with attention sinks</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Guangxuan</forename><surname>Xiao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuandong</forename><surname>Tian</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Beidi</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Song</forename><surname>Han</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Mike</forename><surname>Lewis</surname></persName>\n\t\t</author>\n\t</analytic>\n\t<monogr>\n\t\t<title level=\"j\" xml:id=\"_6Bu4Rkb\">arXiv</title>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2023\">2023</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "fdc53c2c10742464087c0525f77e32604827a21d",
+        "title": "Efficient Streaming Language Models with Attention Sinks",
+        "abstract": "Deploying Large Language Models (LLMs) in streaming applications such as multi-round dialogue, where long interactions are expected, is urgently needed but poses two major challenges. Firstly, during the decoding stage, caching previous tokens' Key and Value states (KV) consumes extensive memory. Secondly, popular LLMs cannot generalize to longer texts than the training sequence length. Window attention, where only the most recent KVs are cached, is a natural approach -- but we show that it fails when the text length surpasses the cache size. We observe an interesting phenomenon, namely attention sink, that keeping the KV of initial tokens will largely recover the performance of window attention. In this paper, we first demonstrate that the emergence of attention sink is due to the strong attention scores towards initial tokens as a\"sink\"even if they are not semantically important. Based on the above analysis, we introduce StreamingLLM, an efficient framework that enables LLMs trained with a finite length attention window to generalize to infinite sequence lengths without any fine-tuning. We show that StreamingLLM can enable Llama-2, MPT, Falcon, and Pythia to perform stable and efficient language modeling with up to 4 million tokens and more. In addition, we discover that adding a placeholder token as a dedicated attention sink during pre-training can further improve streaming deployment. In streaming settings, StreamingLLM outperforms the sliding window recomputation baseline by up to 22.2x speedup. Code and datasets are provided at https://github.com/mit-han-lab/streaming-llm.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2023-09-29",
+        "venue": "International Conference on Learning Representations",
+        "year": "2023",
+        "citation_count": 965,
+        "novel": null,
+        "authors": "Guangxuan Xiao, Yuandong Tian, Beidi Chen, Song Han, Mike Lewis",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b24",
+      "title": "Duoattention: Efficient long-context llm inference with retrieval and streaming heads",
+      "authors": [
+        "Guangxuan Xiao",
+        "Jiaming Tang",
+        "Jingwei Zuo",
+        "Junxian Guo",
+        "Shang Yang",
+        "Haotian Tang",
+        "Yao Fu",
+        "Song Han"
+      ],
+      "year": "2024",
+      "venue": "Duoattention: Efficient long-context llm inference with retrieval and streaming heads",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b24\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_45q5RJZ\">Duoattention: Efficient long-context llm inference with retrieval and streaming heads</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Guangxuan</forename><surname>Xiao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jiaming</forename><surname>Tang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jingwei</forename><surname>Zuo</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Junxian</forename><surname>Guo</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Shang</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Haotian</forename><surname>Tang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yao</forename><surname>Fu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Song</forename><surname>Han</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2410.10819\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "8f3d959238e67bf6b9bc9818025d0d2e403e478f",
+        "title": "DuoAttention: Efficient Long-Context LLM Inference with Retrieval and Streaming Heads",
+        "abstract": "Deploying long-context large language models (LLMs) is essential but poses significant computational and memory challenges. Caching all Key and Value (KV) states across all attention heads consumes substantial memory. Existing KV cache pruning methods either damage the long-context capabilities of LLMs or offer only limited efficiency improvements. In this paper, we identify that only a fraction of attention heads, a.k.a, Retrieval Heads, are critical for processing long contexts and require full attention across all tokens. In contrast, all other heads, which primarily focus on recent tokens and attention sinks--referred to as Streaming Heads--do not require full attention. Based on this insight, we introduce DuoAttention, a framework that only applies a full KV cache to retrieval heads while using a light-weight, constant-length KV cache for streaming heads, which reduces both LLM's decoding and pre-filling memory and latency without compromising its long-context abilities. DuoAttention uses a lightweight, optimization-based algorithm with synthetic data to identify retrieval heads accurately. Our method significantly reduces long-context inference memory by up to 2.55x for MHA and 1.67x for GQA models while speeding up decoding by up to 2.18x and 1.50x and accelerating pre-filling by up to 1.73x and 1.63x for MHA and GQA models, respectively, with minimal accuracy loss compared to full attention. Notably, combined with quantization, DuoAttention enables Llama-3-8B decoding with 3.3 million context length on a single A100 GPU. Code is provided in https://github.com/mit-han-lab/duo-attention.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-10-14",
+        "venue": "International Conference on Learning Representations",
+        "year": "2024",
+        "citation_count": 105,
+        "novel": null,
+        "authors": "Guangxuan Xiao, Jiaming Tang, Jingwei Zuo, Junxian Guo, Shang Yang, Haotian Tang, Yao Fu, Song Han",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b25",
+      "title": "Tidaldecode: Fast and accurate llm decoding with position persistent sparse attention",
+      "authors": [
+        "Lijie Yang",
+        "Zhihao Zhang",
+        "Zhuofu Chen",
+        "Zikun Li",
+        "Zhihao Jia"
+      ],
+      "year": "2024",
+      "venue": "Tidaldecode: Fast and accurate llm decoding with position persistent sparse attention",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b25\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_F9ZjgW5\">Tidaldecode: Fast and accurate llm decoding with position persistent sparse attention</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lijie</forename><surname>Yang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhihao</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhuofu</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zikun</forename><surname>Li</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhihao</forename><surname>Jia</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2410.05076\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024\">2024</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "a336bf38ebfdadd2992f9f976c963f7280c99d5f",
+        "title": "TidalDecode: Fast and Accurate LLM Decoding with Position Persistent Sparse Attention",
+        "abstract": "Large language models (LLMs) have driven significant advancements across diverse NLP tasks, with long-context models gaining prominence for handling extended inputs. However, the expanding key-value (KV) cache size required by Transformer architectures intensifies the memory constraints, particularly during the decoding phase, creating a significant bottleneck. Existing sparse attention mechanisms designed to address this bottleneck have two limitations: (1) they often fail to reliably identify the most relevant tokens for attention, and (2) they overlook the spatial coherence of token selection across consecutive Transformer layers, which can lead to performance degradation and substantial overhead in token selection. This paper introduces TidalDecode, a simple yet effective algorithm and system for fast and accurate LLM decoding through position persistent sparse attention. TidalDecode leverages the spatial coherence of tokens selected by existing sparse attention methods and introduces a few token selection layers that perform full attention to identify the tokens with the highest attention scores, while all other layers perform sparse attention with the pre-selected tokens. This design enables TidalDecode to substantially reduce the overhead of token selection for sparse attention without sacrificing the quality of the generated results. Evaluation on a diverse set of LLMs and tasks shows that TidalDecode closely matches the generative performance of full attention methods while reducing the LLM decoding latency by up to 2.1x.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2024-10-07",
+        "venue": "International Conference on Learning Representations",
+        "year": "2024",
+        "citation_count": 5,
+        "novel": null,
+        "authors": "Lijie Yang, Zhihao Zhang, Zhuofu Chen, Zikun Li, Zhihao Jia",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b26",
+      "title": "Cascade inference: Memory bandwidth efficient shared prefix batch decoding",
+      "authors": [
+        "Preprint Zihao Ye",
+        "Ruihang Lai",
+        "Roy Lu",
+        "Chien-Yu Lin",
+        "Size Zheng",
+        "Lequn Chen",
+        "Tianqi Chen",
+        "Luis Ceze"
+      ],
+      "year": "2024",
+      "venue": "Cascade inference: Memory bandwidth efficient shared prefix batch decoding",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b26\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_5swxEPP\">Cascade inference: Memory bandwidth efficient shared prefix batch decoding</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Preprint</forename><surname>Zihao Ye</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ruihang</forename><surname>Lai</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Roy</forename><surname>Lu</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Chien-Yu</forename><surname>Lin</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Size</forename><surname>Zheng</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lequn</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tianqi</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Luis</forename><surname>Ceze</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://flashinfer.ai/2024/01/08/cascade-inference.html\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2024-01\">Jan 2024</date>\n\t\t\t<biblScope unit=\"page\" from=\"2024\" to=\"2026\"/>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": null
+    },
+    {
+      "id": "b27",
+      "title": "Native sparse attention: Hardware-aligned and natively trainable sparse attention",
+      "authors": [
+        "Jingyang Yuan",
+        "Huazuo Gao",
+        "Damai Dai",
+        "Junyu Luo",
+        "Liang Zhao",
+        "Zhengyan Zhang",
+        "Zhenda Xie",
+        "Y Wei",
+        "Lean Wang",
+        "Zhiping Xiao",
+        "Yuqing Wang",
+        "Chong Ruan",
+        "Ming Zhang",
+        "Wenfeng Liang",
+        "Wangding Zeng"
+      ],
+      "year": "2025",
+      "venue": "Native sparse attention: Hardware-aligned and natively trainable sparse attention",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b27\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_Kgbd7bW\">Native sparse attention: Hardware-aligned and natively trainable sparse attention</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Jingyang</forename><surname>Yuan</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Huazuo</forename><surname>Gao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Damai</forename><surname>Dai</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Junyu</forename><surname>Luo</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Liang</forename><surname>Zhao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhengyan</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhenda</forename><surname>Xie</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Y</forename><forename type=\"middle\">X</forename><surname>Wei</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lean</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhiping</forename><surname>Xiao</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuqing</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Chong</forename><surname>Ruan</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ming</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Wenfeng</forename><surname>Liang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Wangding</forename><surname>Zeng</surname></persName>\n\t\t</author>\n\t\t<ptr target=\"https://arxiv.org/abs/2502.11089\"/>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2025\">2025</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n",
+      "ss_paper_obj": {
+        "paper_id": "23c2e21b6a5789724715f2986fdc586a517ffe57",
+        "title": "Native Sparse Attention: Hardware-Aligned and Natively Trainable Sparse Attention",
+        "abstract": "Long-context modeling is crucial for next-generation language models, yet the high computational cost of standard attention mechanisms poses significant computational challenges. Sparse attention offers a promising direction for improving efficiency while maintaining model capabilities. We present NSA, a Natively trainable Sparse Attention mechanism that integrates algorithmic innovations with hardware-aligned optimizations to achieve efficient long-context modeling. NSA employs a dynamic hierarchical sparse strategy, combining coarse-grained token compression with fine-grained token selection to preserve both global context awareness and local precision. Our approach advances sparse attention design with two key innovations: (1) We achieve substantial speedups through arithmetic intensity-balanced algorithm design, with implementation optimizations for modern hardware. (2) We enable end-to-end training, reducing pretraining computation without sacrificing model performance. As shown in Figure 1, experiments show the model pretrained with NSA maintains or exceeds Full Attention models across general benchmarks, long-context tasks, and instruction-based reasoning. Meanwhile, NSA achieves substantial speedups over Full Attention on 64k-length sequences across decoding, forward propagation, and backward propagation, validating its efficiency throughout the model lifecycle.",
+        "citations": [],
+        "embedding": null,
+        "publication_date": "2025-02-16",
+        "venue": "Annual Meeting of the Association for Computational Linguistics",
+        "year": "2025",
+        "citation_count": 113,
+        "novel": null,
+        "authors": "Jingyang Yuan, Huazuo Gao, Damai Dai, Junyu Luo, Liang Zhao, Zhengyan Zhang, Zhenda Xie, Y. X. Wei, Lean Wang, Zhiping Xiao, Yuqing Wang, C. Ruan, Ming Zhang, W. Liang, Wangding Zeng",
+        "cited_paper": false
+      }
+    },
+    {
+      "id": "b28",
+      "title": "H 2 o: Heavyhitter oracle for efficient generative inference of large language models",
+      "authors": [
+        "Zhenyu Zhang",
+        "Ying Sheng",
+        "Tianyi Zhou",
+        "Tianlong Chen",
+        "Lianmin Zheng",
+        "Ruisi Cai",
+        "Zhao Song",
+        "Yuandong Tian",
+        "Christopher Ré",
+        "Clark Barrett",
+        "Zhangyang Wang",
+        "Beidi Chen"
+      ],
+      "year": "2023",
+      "venue": "H 2 o: Heavyhitter oracle for efficient generative inference of large language models",
+      "doi": null,
+      "raw_citation": "<biblStruct xmlns=\"http://www.tei-c.org/ns/1.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:id=\"b28\">\n\t<monogr>\n\t\t<title level=\"m\" type=\"main\" xml:id=\"_5wCxBJP\">H 2 o: Heavyhitter oracle for efficient generative inference of large language models</title>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhenyu</forename><surname>Zhang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ying</forename><surname>Sheng</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tianyi</forename><surname>Zhou</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Tianlong</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Lianmin</forename><surname>Zheng</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Ruisi</forename><surname>Cai</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhao</forename><surname>Song</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Yuandong</forename><surname>Tian</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Christopher</forename><surname>Ré</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Clark</forename><surname>Barrett</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Zhangyang</forename><surname>Wang</surname></persName>\n\t\t</author>\n\t\t<author>\n\t\t\t<persName><forename type=\"first\">Beidi</forename><surname>Chen</surname></persName>\n\t\t</author>\n\t\t<imprint>\n\t\t\t<date type=\"published\" when=\"2023\">2023</date>\n\t\t</imprint>\n\t</monogr>\n</biblStruct>\n\n\t\t\t\t",
+      "ss_paper_obj": null
+    }
+  ],
+  "citation_contexts": []
+}
