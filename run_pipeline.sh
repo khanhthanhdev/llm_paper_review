@@ -54,7 +54,11 @@ echo "GROBID URL: $GROBID_URL"
 echo "MinerU URL: $MINERU_URL"
 echo ""
 
-
+RUN_TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+LOG_DIR="logs/cli_runs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/${SUBMISSION_ID}_${RUN_TIMESTAMP}.log"
+echo "Log output: $LOG_FILE"
 
 # Optional: Check MinerU service (comment out if running MinerU locally)
 # if curl -s --connect-timeout 5 "$MINERU_URL/health" > /dev/null 2>&1; then
@@ -67,7 +71,7 @@ echo ""
 echo ""
 echo "Starting pipeline..."
 
-# Run the pipeline
+# Run the pipeline and persist logs
 python src/full_pipeline_runner.py \
   --submission-id "$SUBMISSION_ID" \
   --pdf "$PDF_PATH" \
@@ -77,8 +81,17 @@ python src/full_pipeline_runner.py \
   --model "$MODEL" \
   --temperature "$TEMPERATURE" \
   --ocr-workers "$OCR_WORKERS" \
-  --verbose
+  --verbose |& tee "$LOG_FILE"
+
+exit_code=${PIPESTATUS[0]}
+
+echo ""
+if [ $exit_code -ne 0 ]; then
+  echo "Pipeline encountered an error. Review $LOG_FILE"
+  exit $exit_code
+fi
 
 echo ""
 echo "Pipeline completed!"
 echo "Check results in: $DATA_DIR/$SUBMISSION_ID/"
+echo "Logs archived at: $LOG_FILE"

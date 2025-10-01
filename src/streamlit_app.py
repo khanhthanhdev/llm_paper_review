@@ -7,6 +7,7 @@ import io
 import json
 import logging
 import os
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Iterator, Optional, TYPE_CHECKING
@@ -19,6 +20,7 @@ from full_pipeline_runner import build_steps, ensure_submission_workspace, prepa
 
 
 LOGGER = logging.getLogger("streamlit_app")
+LOG_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 load_dotenv()
 
 DATA_ROOT = Path(os.getenv("PIPELINE_DATA_DIR", "data")).resolve()
@@ -115,6 +117,60 @@ if TYPE_CHECKING:  # pragma: no cover - import only when type checking
     from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 
+class StreamlitLogHandler(logging.Handler):
+    """Streamlit-aware log handler that mirrors log lines into the UI."""
+
+    def __init__(self, placeholder: "st.delta_generator.DeltaGenerator", *, max_lines: int = 200) -> None:
+        super().__init__(level=logging.INFO)
+        self.placeholder = placeholder
+        self.max_lines = max_lines
+        self._lines: list[str] = []
+
+    def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover - UI side effects only
+        message = self.format(record)
+        self._lines.append(message)
+        if len(self._lines) > self.max_lines:
+            self._lines = self._lines[-self.max_lines :]
+        payload = "\n".join(self._lines)
+        self.placeholder.markdown(f"```text\n{payload}\n```")
+
+
+def _create_run_log_path(submission_dir: Path, submission_id: str) -> Path:
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_dir = submission_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    return log_dir / f"streamlit_{submission_id}_{timestamp}.log"
+
+
+@contextmanager
+def _attach_run_loggers(log_path: Path, ui_placeholder: "st.delta_generator.DeltaGenerator") -> Iterator[None]:
+    """Attach file + UI log handlers for the duration of a run."""
+
+    root_logger = logging.getLogger()
+    original_level = root_logger.level
+    if original_level > logging.INFO:
+        root_logger.setLevel(logging.INFO)
+
+    file_handler = logging.FileHandler(log_path, encoding="utf-8")
+    file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+    file_handler.setLevel(logging.INFO)
+
+    ui_handler = StreamlitLogHandler(ui_placeholder)
+    ui_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(ui_handler)
+
+    try:
+        yield
+    finally:
+        root_logger.removeHandler(file_handler)
+        root_logger.removeHandler(ui_handler)
+        file_handler.close()
+        ui_handler.close()
+        root_logger.setLevel(original_level)
+
+
 def save_uploaded_pdf(uploaded_file: "UploadedFile", submission_dir: Path, submission_id: str) -> Path:
     """Persist the uploaded PDF to the submission workspace."""
 
@@ -137,6 +193,7 @@ def run_pipeline_with_progress(
     """Yield progress updates while executing the pipeline."""
 
     force = not reuse_cached
+    LOGGER.info("Starting pipeline build for submission '%s'", submission_id)
     steps = build_steps(
         submission_id=submission_id,
         submission_dir=submission_dir,
@@ -152,12 +209,17 @@ def run_pipeline_with_progress(
 
     for step in steps:
         if reuse_cached and step.should_skip():
+            LOGGER.info("Skipping step (cached): %s", step.name)
             yield "skipped", step.name
             continue
 
+        LOGGER.info("Starting step: %s", step.name)
         yield "running", step.name
         step.action()
+        LOGGER.info("Completed step: %s", step.name)
         yield "completed", step.name
+
+    LOGGER.info("Pipeline finished for submission '%s'", submission_id)
 
 
 def render_text_output(*, title: str, file_path: Path, submission_id: str) -> None:
@@ -326,38 +388,52 @@ def main() -> None:
             submission_dir = ensure_submission_workspace(DATA_ROOT, submission_id)
             pdf_input_path: Optional[Path] = None
             if uploaded_pdf is not None:
-                pdf_input_path = save_uploaded_pdf(uploaded_pdf, submission_dir, submission_id)
+                pdf_input_path = save_uploaded_pdf(uploaded_file=uploaded_pdf, submission_dir=submission_dir, submission_id=submission_id)
 
-            with st.status("Running analysis…", expanded=True) as status:
-                status.write(f"Workspace: {submission_dir}")
+            log_path = _create_run_log_path(submission_dir, submission_id)
+            log_expander = st.expander("Run log", expanded=True)
+            log_placeholder = log_expander.empty()
 
-                try:
-                    pdf_path = prepare_pdf(submission_dir, submission_id, pdf_input_path)
-                except FileNotFoundError as exc:
-                    status.update(label="Pipeline failed", state="error")
-                    st.error(str(exc))
-                else:
+            run_succeeded = False
+            with _attach_run_loggers(log_path, log_placeholder):
+                LOGGER.info("Run log for submission '%s' stored at %s", submission_id, log_path)
+                with st.status("Running analysis…", expanded=True) as status:
+                    status.write(f"Workspace: {submission_dir}")
+                    status.write(f"Log file: {log_path}")
+
                     try:
-                        for state, name in run_pipeline_with_progress(
-                            submission_id=submission_id,
-                            submission_dir=submission_dir,
-                            pdf_path=pdf_path,
-                            reuse_cached=reuse_cached,
-                        ):
-                            if state == "skipped":
-                                status.write(f"Skipping {name} (cached)")
-                            elif state == "running":
-                                status.write(f"Running {name}…")
-                            elif state == "completed":
-                                status.write(f"Completed {name}")
-                    except Exception as exc:  # pragma: no cover - surfaced to UI
-                        LOGGER.exception("Pipeline failed")
+                        pdf_path = prepare_pdf(submission_dir, submission_id, pdf_input_path)
+                    except FileNotFoundError as exc:
                         status.update(label="Pipeline failed", state="error")
-                        st.error(f"Pipeline failed: {exc}")
+                        st.error(str(exc))
                     else:
-                        status.update(label="Analysis complete", state="complete", expanded=False)
-                        st.success("Pipeline completed successfully.")
-                        st.session_state["current_submission_id"] = submission_id
+                        try:
+                            for state, name in run_pipeline_with_progress(
+                                submission_id=submission_id,
+                                submission_dir=submission_dir,
+                                pdf_path=pdf_path,
+                                reuse_cached=reuse_cached,
+                            ):
+                                if state == "skipped":
+                                    status.write(f"Skipping {name} (cached)")
+                                elif state == "running":
+                                    status.write(f"Running {name}…")
+                                elif state == "completed":
+                                    status.write(f"Completed {name}")
+                        except Exception as exc:  # pragma: no cover - surfaced to UI
+                            LOGGER.exception("Pipeline failed")
+                            status.update(label="Pipeline failed", state="error")
+                            st.error(f"Pipeline failed: {exc}")
+                        else:
+                            status.update(label="Analysis complete", state="complete", expanded=False)
+                            st.success("Pipeline completed successfully.")
+                            st.session_state["current_submission_id"] = submission_id
+                            run_succeeded = True
+
+            if run_succeeded:
+                st.caption(f"Run log saved to `{log_path}`")
+            else:
+                st.caption(f"Run log saved to `{log_path}` for troubleshooting")
 
     selected_submission_id = st.session_state.get("current_submission_id")
     selected_submission_dir = DATA_ROOT / selected_submission_id if selected_submission_id else None
