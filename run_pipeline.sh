@@ -6,7 +6,7 @@
 # Configuration
 # Leave SUBMISSION_ID empty to automatically generate one from the PDF name + timestamp
 SUBMISSION_ID=""
-PDF_PATH="/workspace/llm_paper_review/data/LIM/LIM.pdf"
+PDF_PATH="paper.pdf"
 DATA_DIR="data"
 GROBID_URL="http://localhost:8070"
 MINERU_URL="http://localhost:8000"  # Update if MinerU runs on different port
