@@ -740,7 +740,8 @@ class PaperRankingSystem:
                 total_cost = 0.0
             elif ranking_type == "general":
                 self.logger.debug("Using sliding windows approach for general ranking")
-                ranked_item_list, total_cost = sliding_windows(item)
+                ranked_item_list = sliding_windows(item)
+                total_cost = 0.0
             else:
                 self.logger.debug("Using purpose-based ranking approach")
                 # Purpose-based ranking
@@ -771,7 +772,7 @@ class PaperRankingSystem:
                         PURPOSE_PROMPT_PREFIX + messages[3:-1] + PURPOSE_PROMPT_POST
                     )
 
-                    permutation, cost = run_llm(
+                    permutation = run_llm(
                         messages,
                         model_name=self.ranking_model,
                         api_key=self.openai_api_key,
@@ -783,7 +784,6 @@ class PaperRankingSystem:
 
                     end_pos = end_pos - step
                     start_pos = start_pos - step
-                    total_cost += cost
 
             # Reconstruct paper list from ranked results
             reranked_papers_list = []

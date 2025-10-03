@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export PATH="/home/jules/.pyenv/versions/3.12.11/bin:$PATH"
+
 GROBID_IMAGE="lfoppiano/grobid:0.8.2"
 GROBID_CONTAINER_NAME="grobid_service"
 GROBID_PORT="8070"
@@ -17,9 +19,9 @@ cleanup() {
     wait "${MINERU_PID}" 2>/dev/null || true
   fi
 
-  if docker ps --format '{{.Names}}' | grep -Fxq "${GROBID_CONTAINER_NAME}"; then
+  if sudo docker ps --format '{{.Names}}' | grep -Fxq "${GROBID_CONTAINER_NAME}"; then
     echo "Stopping GROBID container (${GROBID_CONTAINER_NAME})..."
-    docker stop "${GROBID_CONTAINER_NAME}" >/dev/null 2>&1 || true
+    sudo docker stop "${GROBID_CONTAINER_NAME}" >/dev/null 2>&1 || true
   fi
 
   exit "${exit_code}"
@@ -45,16 +47,16 @@ fi
 
 mkdir -p "${MINERU_LOG_DIR}"
 
-if docker ps --format '{{.Names}}' | grep -Fxq "${GROBID_CONTAINER_NAME}"; then
+if sudo docker ps --format '{{.Names}}' | grep -Fxq "${GROBID_CONTAINER_NAME}"; then
   echo "GROBID container '${GROBID_CONTAINER_NAME}' already running. Skipping start."
 else
-  if docker ps -a --format '{{.Names}}' | grep -Fxq "${GROBID_CONTAINER_NAME}"; then
+  if sudo docker ps -a --format '{{.Names}}' | grep -Fxq "${GROBID_CONTAINER_NAME}"; then
     echo "Removing previously exited container '${GROBID_CONTAINER_NAME}'."
-    docker rm "${GROBID_CONTAINER_NAME}" >/dev/null
+    sudo docker rm "${GROBID_CONTAINER_NAME}" >/dev/null
   fi
 
   echo "Starting GROBID (${GROBID_IMAGE}) on port ${GROBID_PORT}..."
-  docker run \
+  sudo docker run \
     --detach \
     --rm \
     --name "${GROBID_CONTAINER_NAME}" \
