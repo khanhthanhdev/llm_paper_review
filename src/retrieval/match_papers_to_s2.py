@@ -31,6 +31,26 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Paper:
+    """Represents a scholarly paper with its associated metadata.
+
+    This dataclass is used to store structured information about a paper,
+    such as its title, abstract, authors, and citation metrics, often retrieved
+    from an external API like Semantic Scholar.
+
+    Attributes:
+        paper_id: The unique identifier for the paper (e.g., from Semantic Scholar).
+        title: The title of the paper.
+        abstract: The abstract of the paper.
+        citations: A list of paper IDs that this paper cites.
+        embedding: A numerical representation (embedding) of the paper's content.
+        publication_date: The date the paper was published.
+        venue: The conference or journal where the paper was published.
+        year: The year of publication.
+        citation_count: The number of times the paper has been cited.
+        novel: A field for storing novelty assessment information.
+        authors: A comma-separated string of author names.
+        cited_paper: A boolean flag indicating if this is a cited paper.
+    """
     paper_id: str
     title: str = ""
     abstract: str = ""
@@ -47,7 +67,15 @@ class Paper:
     cited_paper: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert Paper object to dictionary, handling numpy arrays."""
+        """Converts the Paper object to a dictionary.
+
+        This method is useful for serialization, especially when preparing the
+        object to be saved as JSON. It specifically handles the conversion of
+        a NumPy array (used for embeddings) into a list.
+
+        Returns:
+            A dictionary representation of the Paper instance.
+        """
         result = {}
         for key, value in self.__dict__.items():
             if isinstance(value, np.ndarray):
@@ -58,9 +86,29 @@ class Paper:
 
 
 class SemanticScholarAPI:
-    """Class to handle Semantic Scholar API interactions with rate limiting and error handling."""
+    """A client for the Semantic Scholar Graph API.
+
+    This class provides a convenient interface for querying the Semantic Scholar
+    API. It includes features like automatic rate limiting, request retries with
+    exponential backoff, and handling of API keys.
+
+    Attributes:
+        api_key: The Semantic Scholar API key.
+        rate_limit_delay: The minimum time to wait between requests, in seconds.
+        base_url: The base URL for the API endpoint.
+        headers: The HTTP headers to include in requests, containing the API key if provided.
+        last_request_time: The timestamp of the last request, used for rate limiting.
+    """
 
     def __init__(self, api_key: str = None, rate_limit_delay: float = 1.0):
+        """Initializes the SemanticScholarAPI client.
+
+        Args:
+            api_key: The Semantic Scholar API key. If not provided, it will be
+                     read from the `SEMANTIC_SCHOLAR_API_KEY` environment variable.
+            rate_limit_delay: The delay in seconds to enforce between API calls
+                              to respect rate limits.
+        """
         if not api_key:
             api_key = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
         
@@ -78,7 +126,7 @@ class SemanticScholarAPI:
         )
 
     def _rate_limit(self):
-        """Ensure we don't exceed rate limits."""
+        """Enforces a delay between API requests to avoid rate limiting."""
         current_time = time.time()
         time_since_last = current_time - self.last_request_time
         if time_since_last < self.rate_limit_delay:
@@ -95,7 +143,20 @@ class SemanticScholarAPI:
         ),
     )
     def _make_request(self, params: Dict[str, Any]) -> requests.Response:
-        """Make API request with retry logic."""
+        """Makes an API request with rate limiting and retry logic.
+
+        This method is decorated with `tenacity.retry` to automatically handle
+        transient network errors by retrying the request with exponential backoff.
+
+        Args:
+            params: A dictionary of query parameters to be sent with the request.
+
+        Returns:
+            The `requests.Response` object from the API call.
+
+        Raises:
+            requests.exceptions.RequestException: If the request fails after all retries.
+        """
         self._rate_limit()
 
         try:
@@ -108,14 +169,17 @@ class SemanticScholarAPI:
             raise
 
     def get_paper_by_title(self, title: str) -> Optional[Paper]:
-        """
-        Fetch a paper from Semantic Scholar by title and return a Paper object.
+        """Fetches paper details from Semantic Scholar by its title.
+
+        This method sends a query to the API, parses the response, and constructs
+        a `Paper` object with the retrieved metadata.
 
         Args:
-            title (str): Title of the paper to search for.
+            title: The title of the paper to search for.
 
         Returns:
-            Optional[Paper]: A Paper object with relevant details or None if not found.
+            A `Paper` object populated with the details from the API if a match
+            is found, otherwise None.
         """
         if not title or not title.strip():
             logger.warning("Empty title provided")
@@ -177,18 +241,24 @@ class SemanticScholarAPI:
             return None
 
 
-def process_for_pipeline(data_dir: str, submission_id: str, api_key: str = None, rate_limit_delay: float = 1.0):
-    """
-    Process a single submission for pipeline integration.
-    
+def process_for_pipeline(data_dir: str, submission_id: str, api_key: str = None, rate_limit_delay: float = 1.0) -> bool:
+    """Enriches citation data for a submission by fetching details from Semantic Scholar.
+
+    This function reads a JSON file containing a list of cited papers for a
+    submission, queries the Semantic Scholar API for each paper by title, and
+    updates the JSON file with the retrieved metadata.
+
     Args:
-        data_dir: Base data directory for pipeline
-        submission_id: ID of the submission
-        api_key: Semantic Scholar API key (optional)
-        rate_limit_delay: Delay between API requests in seconds
-    
+        data_dir: The base directory for all pipeline data.
+        submission_id: The unique identifier for the submission.
+        api_key: An optional Semantic Scholar API key.
+        rate_limit_delay: The delay between API requests in seconds.
+
     Returns:
-        Processing statistics
+        `True` if the processing completes successfully, `False` otherwise.
+
+    Raises:
+        FileNotFoundError: If the input JSON file for the submission does not exist.
     """
     # Input file path 
     input_file = Path(data_dir) / submission_id / f"{submission_id}.json"
@@ -243,6 +313,12 @@ def process_for_pipeline(data_dir: str, submission_id: str, api_key: str = None,
 
 
 if __name__ == "__main__":
+    """The main entry point for the script.
+
+    Parses command-line arguments and initiates the citation enrichment process
+    for a specified submission. This allows the script to be run as a standalone
+    tool to fetch data from Semantic Scholar.
+    """
     parser = argparse.ArgumentParser(
         description="Enrich cited papers with Semantic Scholar data - single submission mode only"
     )

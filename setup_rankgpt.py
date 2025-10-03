@@ -13,12 +13,21 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def setup_rankgpt(target_dir: str = None):
-    """
-    Clone and setup RankGPT from GitHub.
-    
+def setup_rankgpt(target_dir: str = None) -> str | None:
+    """Clones the RankGPT repository from GitHub to ensure it's available.
+
+    This function checks if RankGPT already exists in the target location. If not,
+    it clones the repository from GitHub. This is a setup utility to manage the
+    dependency on the RankGPT project.
+
     Args:
-        target_dir: Target directory to clone RankGPT. If None, uses ~/.cache/llm_paper_review/RankGPT
+        target_dir: The directory where RankGPT should be cloned. If None, it
+                    defaults to a user-specific cache directory
+                    `~/.cache/llm_paper_review/RankGPT`.
+
+    Returns:
+        The path to the RankGPT directory as a string if setup is successful,
+        otherwise None.
     """
     if target_dir is None:
         target_dir = Path.home() / ".cache" / "llm_paper_review" / "RankGPT"
@@ -61,8 +70,15 @@ def setup_rankgpt(target_dir: str = None):
         logger.error(f"Unexpected error setting up RankGPT: {e}")
         return None
 
-def main():
-    """Main function for command line usage."""
+def main() -> int:
+    """The main entry point for the command-line script.
+
+    Parses command-line arguments and runs the `setup_rankgpt` function to
+    download and set up the RankGPT dependency.
+
+    Returns:
+        0 on success, 1 on failure.
+    """
     import argparse
     
     parser = argparse.ArgumentParser(description="Setup RankGPT dependency")

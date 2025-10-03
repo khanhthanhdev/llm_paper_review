@@ -13,17 +13,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def extract_introduction(mmd_file_path):
-    """
-    Extract the introduction section from a Nougat-OCR generated MMD file of an ICLR 2025 paper.
-    The function looks for Introduction or Background sections in various formats, including
-    cases with Roman numerals and standalone lines without hashtags.
+def extract_introduction(mmd_file_path: str) -> str | None:
+    """Extracts the introduction section from an OCR-processed markdown file.
+
+    This function uses a series of regular expressions to find sections titled
+    "Introduction" or "Background". It is designed to be robust to common OCR
+    errors and formatting variations, such as different heading levels, numbering
+    schemes (Arabic and Roman), and LaTeX-style section commands.
 
     Args:
-        mmd_file_path (str): Path to the MMD file.
+        mmd_file_path: The path to the markdown (.mmd or .md) file.
 
     Returns:
-        str: The extracted introduction section text or None if not found.
+        The cleaned text of the introduction or background section, or None if
+        no such section is found.
     """
     try:
         with open(mmd_file_path, "r", encoding="utf-8") as file:
@@ -85,17 +88,19 @@ def extract_introduction(mmd_file_path):
         return None
 
 
-def find_ocr_file(paper_id: str, base_dir: str) -> str:
-    """
-    Find the OCR output file for a given paper ID in the single ocr directory.
-    Supports multiple file formats (.md, .mmd, .txt).
-    
+def find_ocr_file(paper_id: str, base_dir: str) -> str | None:
+    """Finds the OCR output file for a given paper ID.
+
+    It searches within a standardized `ocr/` subdirectory for files matching
+    the paper ID with common markdown or text extensions (.md, .mmd, .txt).
+
     Args:
-        paper_id: The paper ID to find OCR for
-        base_dir: Base directory containing ocr/ subdirectory
-    
+        paper_id: The unique identifier of the paper.
+        base_dir: The base directory of the submission, which should contain
+                  the `ocr/` subdirectory.
+
     Returns:
-        str: Path to the OCR file, or None if not found
+        The path to the found OCR file as a string, or None if no file is found.
     """
     base_path = Path(base_dir)
     ocr_dir = base_path / "ocr"
@@ -113,16 +118,19 @@ def find_ocr_file(paper_id: str, base_dir: str) -> str:
 
 
 def process_for_pipeline(data_dir: str, submission_id: str) -> bool:
-    """
-    Process a single submission for pipeline integration.
-    Extract introductions for both main paper and related papers.
-    
+    """Orchestrates the introduction extraction process for a single submission.
+
+    This function handles both the main paper and its related works. It locates
+    the necessary OCR files, calls the extraction logic, and saves the resulting
+    introduction texts to a standardized `introductions/` directory.
+
     Args:
-        data_dir: Base data directory for pipeline
-        submission_id: ID of the submission
-    
+        data_dir: The base directory for all pipeline data.
+        submission_id: The unique identifier for the submission.
+
     Returns:
-        bool: Success status
+        `True` if at least one introduction (either from the main paper or a
+        related work) was successfully extracted, otherwise `False`.
     """
     submission_dir = Path(data_dir) / submission_id
     
@@ -217,6 +225,12 @@ def process_for_pipeline(data_dir: str, submission_id: str) -> bool:
 
 
 if __name__ == "__main__":
+    """The main entry point for the script.
+
+    Parses command-line arguments to run the introduction extraction process
+    for a single submission. This allows the script to be used as a standalone
+    component of the pipeline.
+    """
     parser = argparse.ArgumentParser(description="Extract introductions from OCR outputs - single submission mode only")
     parser.add_argument(
         "--data-dir",

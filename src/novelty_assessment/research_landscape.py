@@ -81,7 +81,22 @@ Ensure your analysis is comprehensive, identifying significant patterns and rela
 
 # Define models for structured data
 class PaperInformation(BaseModel):
-    """Structured information extracted from a research paper."""
+    """A Pydantic model for storing structured information about a research paper.
+
+    This model defines the schema for the data extracted from each paper,
+    ensuring consistency before it is used in the analysis prompt.
+
+    Attributes:
+        paper_id: The unique identifier for the paper.
+        title: The title of the paper.
+        methods: A list of methods or approaches proposed in the paper.
+        problems: A list of problems the paper addresses.
+        datasets: A list of datasets used for evaluation.
+        metrics: A list of evaluation metrics used.
+        results: A list of key quantitative results, typically as dicts.
+        novelty_claims: A list of explicit claims about the paper's novelty.
+        is_submission: A boolean flag to indicate if this is the submission paper.
+    """
 
     paper_id: str
     title: str
@@ -101,17 +116,28 @@ class PaperInformation(BaseModel):
 
 
 class ResearchLandscapeAnalyzer:
-    """
-    Analyzes a collection of papers to create a comprehensive research landscape.
+    """Analyzes a collection of papers to create a research landscape map.
+
+    This class uses a large language model (LLM) to synthesize structured
+    information from a submission paper and a set of related works into a
+    coherent analysis of the research area. It identifies methodological
+    clusters, problem spaces, and technical evolution.
+
+    Attributes:
+        llm: An instance of a LangChain ChatOpenAI model.
+        research_landscape_prompt (str): The template for the prompt sent to the LLM.
     """
 
     def __init__(self, model_name: str = "gpt-4.1", temperature: float = 0.0):
-        """
-        Initialize the analyzer with the specified LLM.
+        """Initializes the ResearchLandscapeAnalyzer.
 
         Args:
-            model_name: Name of the OpenAI model to use
-            temperature: Temperature setting for the LLM
+            model_name: The identifier for the OpenAI model to be used.
+            temperature: The temperature setting for the LLM, controlling output
+                         randomness.
+
+        Raises:
+            ValueError: If the `OPENAI_API_KEY` environment variable is not set.
         """
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
@@ -124,15 +150,20 @@ class ResearchLandscapeAnalyzer:
         self.research_landscape_prompt = research_landscape_prompt
 
     def load_papers(self, data_dir: str, submission_id: str) -> List[PaperInformation]:
-        """
-        Load paper information from JSON files in the specified directory.
+        """Loads and parses structured information for a submission and its related papers.
+
+        This method reads the structured representations generated in a previous
+        pipeline step for both the main submission and its selected related works,
+        then parses them into a list of `PaperInformation` objects.
 
         Args:
-            data_dir: Directory containing paper information JSON files
-            submission_id: ID of the submission paper
+            data_dir: The base directory where submission data is stored.
+            submission_id: The unique identifier for the submission to load.
 
         Returns:
-            List of PaperInformation objects
+            A list of `PaperInformation` objects, including the submission and
+            its related papers. Returns an empty list if the necessary structured
+            representation file is not found.
         """
         papers = []
 
@@ -187,14 +218,19 @@ class ResearchLandscapeAnalyzer:
         return papers
 
     def format_papers_for_prompt(self, papers: List[PaperInformation]) -> str:
-        """
-        Format the paper information for the prompt.
+        """Formats a list of `PaperInformation` objects into a single string for the LLM prompt.
+
+        The string is structured with clear headings for the submission paper and
+        each related paper, making it easy for the LLM to parse and analyze.
 
         Args:
-            papers: List of PaperInformation objects
+            papers: A list of `PaperInformation` objects.
 
         Returns:
-            Formatted string for the prompt
+            A markdown-formatted string containing the structured information for all papers.
+
+        Raises:
+            ValueError: If no paper in the list is marked as the submission.
         """
         # Separate submission and related papers
         submission_papers = [p for p in papers if p.is_submission]
@@ -262,14 +298,17 @@ class ResearchLandscapeAnalyzer:
         return formatted_text
 
     def analyze_landscape(self, papers: List[PaperInformation]) -> str:
-        """
-        Analyze the research landscape based on the provided papers.
+        """Performs the core research landscape analysis by querying the LLM.
+
+        This method constructs the full prompt by combining the prompt template
+        with the formatted paper information and then invokes the LLM to generate
+        the analysis.
 
         Args:
-            papers: List of PaperInformation objects
+            papers: A list of `PaperInformation` objects to be analyzed.
 
         Returns:
-            Analysis of the research landscape
+            The research landscape analysis generated by the LLM as a string.
         """
         # Format papers for the prompt
         formatted_papers = self.format_papers_for_prompt(papers)
@@ -282,16 +321,22 @@ class ResearchLandscapeAnalyzer:
         return analysis
 
     def run_analysis(self, data_dir: str, submission_id: str, output_file: str) -> str:
-        """
-        Run the complete analysis pipeline.
+        """Runs the end-to-end analysis pipeline for a single submission.
+
+        This method orchestrates the process of loading papers, running the
+        LLM-based analysis, and saving the results to a file. It also records
+        metadata about the API call.
 
         Args:
-            data_dir: Directory containing paper information JSON files
-            submission_id: ID of the submission paper
-            output_file: Path to save the analysis output
+            data_dir: The base directory for all submission data.
+            submission_id: The unique identifier for the submission to process.
+            output_file: The name of the file to save the analysis output to.
 
         Returns:
-            Analysis of the research landscape
+            The generated research landscape analysis as a `langchain_core.messages.ai.AIMessage` object.
+
+        Raises:
+            ValueError: If fewer than two papers are available for analysis.
         """
         # Load papers
         papers = self.load_papers(data_dir, submission_id)
@@ -343,16 +388,19 @@ class ResearchLandscapeAnalyzer:
     def prepare_batch_inference_data(
         self, data_dir: str, model_name: str = "gpt-4.1", output_dir: str = "./openai_inputs"
     ) -> str:
-        """
-        Prepare data for batched inference with OpenAI API.
+        """Prepares a JSONL file for batch processing with the OpenAI API.
+
+        This method iterates through all submission directories, loads the
+        necessary paper data, constructs a prompt for each, and writes them
+        to a JSONL file that can be uploaded to the OpenAI batch API endpoint.
 
         Args:
-            data_dir: Directory containing paper information JSON files
-            model_name: Name of the OpenAI model to use
-            output_dir: Directory to save the batch input file
+            data_dir: The directory containing all submission subdirectories.
+            model_name: The OpenAI model identifier to be included in the batch request.
+            output_dir: The directory where the generated batch file will be saved.
 
         Returns:
-            Path to the generated JSONL batch file
+            The path to the generated JSONL file.
         """
         batch_entries = []
 
@@ -406,15 +454,19 @@ class ResearchLandscapeAnalyzer:
         return output_path
 
     def process_batch_results(self, results_file: str, data_dir: str) -> Dict:
-        """
-        Process the results from the research landscape batch and save them to the appropriate files.
+        """Processes the output from an OpenAI batch API job.
+
+        This method reads the JSONL results file, extracts the generated analysis
+        for each submission, saves it to the correct directory, and compiles
+        statistics about the batch job, including success rate and cost.
 
         Args:
-            results_file: Path to the batch results file (JSONL)
-            data_dir: Directory to store processed data
+            results_file: The path to the JSONL file containing the batch API results.
+            data_dir: The base directory where the output for each submission
+                      will be stored.
 
         Returns:
-            Dict containing processing statistics and information
+            A dictionary containing detailed statistics about the processed batch.
         """
         from litellm import cost_per_token
 
@@ -552,6 +604,14 @@ class ResearchLandscapeAnalyzer:
 if __name__ == "__main__":
     import argparse
     
+    """The main entry point for the script.
+
+    Provides a command-line interface to run the research landscape analysis.
+    It supports three modes:
+    1. Processing a single submission.
+    2. Preparing a batch input file for the OpenAI API.
+    3. Processing the results from a completed OpenAI API batch job.
+    """
     parser = argparse.ArgumentParser(description="Generate research landscape analysis")
     parser.add_argument(
         "--data-dir",

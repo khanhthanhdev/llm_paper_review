@@ -32,7 +32,15 @@ paper_titles = None
 INDENT = "    "  # 4-space indentation
 
 
-def search_arxiv_by_title(title):
+def search_arxiv_by_title(title: str) -> str | None:
+    """Searches the arXiv API for a paper by its title.
+
+    Args:
+        title: The title of the paper to search for.
+
+    Returns:
+        The arXiv ID if found, otherwise None.
+    """
     url = "http://export.arxiv.org/api/query"
     params = {"search_query": f'ti:"{title}"', "start": 0, "max_results": 1}
     res = requests.get(url, params=params)
@@ -50,7 +58,18 @@ def search_arxiv_by_title(title):
     return None
 
 
-def fetch_acl_pdf_url(title):
+def fetch_acl_pdf_url(title: str) -> str | None:
+    """Fetches a PDF URL from the ACL Anthology by title.
+
+    It uses fuzzy string matching to find the most likely paper in the anthology.
+    The ACL Anthology data is lazy-loaded on the first call to this function.
+
+    Args:
+        title: The title of the paper to search for.
+
+    Returns:
+        The URL to the PDF if a close match is found, otherwise None.
+    """
     global anthology, anthology_papers, paper_titles
     
     # Initialize ACL Anthology on first use
@@ -76,7 +95,21 @@ def fetch_acl_pdf_url(title):
         return None
 
 
-def download_pdf(pdf_url, title, paper_id, pdfs_dir):
+def download_pdf(pdf_url: str, title: str, paper_id: str, pdfs_dir: str) -> bool:
+    """Downloads a PDF from a given URL and saves it locally.
+
+    The downloaded file is named using the `paper_id` to ensure a unique and
+    filesystem-friendly filename.
+
+    Args:
+        pdf_url: The URL of the PDF to download.
+        title: The title of the paper (used for logging).
+        paper_id: The unique identifier for the paper, used as the filename.
+        pdfs_dir: The directory where the PDF will be saved.
+
+    Returns:
+        `True` if the download was successful, otherwise `False`.
+    """
     try:
         res = requests.get(pdf_url, timeout=30)
         if res.status_code == 200:
@@ -95,16 +128,24 @@ def download_pdf(pdf_url, title, paper_id, pdfs_dir):
     return False
 
 
-def find_and_download_pdf(paper_data, pdfs_dir):
-    """
-    Download PDF for a paper from the ranking results.
+def find_and_download_pdf(paper_data: dict, pdfs_dir: str) -> str:
+    """Attempts to find and download a PDF for a given paper from multiple sources.
+
+    This function orchestrates the download process by trying the following sources in order:
+    1. Semantic Scholar's open access PDF link.
+    2. arXiv, using an ID from Semantic Scholar or by searching the title.
+    3. The ACL Anthology, by searching the title.
 
     Args:
-        paper_data: Dictionary containing paper information from ranking results
-        pdfs_dir: Directory to save this paper's PDF
+        paper_data: A dictionary containing the paper's metadata, including
+                    'paper_id' and 'title'.
+        pdfs_dir: The directory where the downloaded PDF should be saved.
 
     Returns:
-        str: Status code ("1"=failed, "2"=success, "3"=not_found)
+        A status code indicating the outcome:
+        - "1": The download failed due to an error.
+        - "2": The download was successful.
+        - "3": The PDF could not be found from any source.
     """
     paper_id = paper_data.get("paper_id", "unknown")
     title = paper_data.get("title", "Unknown Title")
@@ -171,16 +212,19 @@ def find_and_download_pdf(paper_data, pdfs_dir):
 
 
 def process_for_pipeline(data_dir: str, submission_id: str) -> bool:
-    """
-    Process a single submission for pipeline integration.
-    Download PDFs for ranked papers from a specific submission.
-    
+    """Orchestrates the PDF download process for all ranked papers in a submission.
+
+    This function reads the list of ranked related papers, attempts to download
+    a PDF for each one, and records statistics about the download process in a
+    metadata file.
+
     Args:
-        data_dir: Base data directory for pipeline
-        submission_id: ID of the submission
-    
+        data_dir: The base directory for all pipeline data.
+        submission_id: The unique identifier for the submission.
+
     Returns:
-        bool: Success status
+        `True` if the process runs to completion (even if some downloads fail),
+        otherwise `False` if a critical error occurs (e.g., missing input file).
     """
     submission_dir = Path(data_dir) / submission_id / "related_work_data"
     complete_results_file = submission_dir / "complete_results.json"
@@ -255,6 +299,11 @@ def process_for_pipeline(data_dir: str, submission_id: str) -> bool:
 
 
 if __name__ == "__main__":
+    """The main entry point for the script.
+
+    Parses command-line arguments and initiates the PDF download process for a
+    specified submission. This allows the script to be run as a standalone tool.
+    """
     parser = argparse.ArgumentParser(description="Download PDFs for ranked papers - single submission mode only")
     parser.add_argument(
         "--data-dir",

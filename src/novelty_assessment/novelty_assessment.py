@@ -127,7 +127,23 @@ Remember that your role is to provide objective analysis that helps reviewers ma
 
 # Reuse PaperInformation model from landscape analysis
 class PaperInformation(BaseModel):
-    """Structured information extracted from a research paper."""
+    """A Pydantic model for storing structured information about a research paper.
+
+    This model is used to ensure that the data extracted from papers (both the
+    submission and related works) adheres to a consistent structure, which is
+    then used for analysis and prompting.
+
+    Attributes:
+        paper_id: The unique identifier for the paper.
+        title: The title of the paper.
+        methods: A list of methods or approaches proposed in the paper.
+        problems: A list of problems the paper addresses.
+        datasets: A list of datasets used for evaluation.
+        metrics: A list of evaluation metrics used.
+        results: A list of key quantitative results, typically as dicts.
+        novelty_claims: A list of explicit claims about the paper's novelty.
+        is_submission: A boolean flag to indicate if this is the submission paper.
+    """
 
     paper_id: str
     title: str
@@ -147,17 +163,26 @@ class PaperInformation(BaseModel):
 
 
 class NoveltyAssessor:
-    """
-    Assesses the novelty of a submission paper in the context of related work.
+    """Performs a detailed novelty assessment of a submission paper.
+
+    This class uses a large language model (LLM) to analyze a submission paper
+    in the context of its cited works and a broader research landscape. It aims
+    to provide an objective, evidence-based analysis to support peer reviewers.
+
+    Attributes:
+        llm: An instance of a LangChain ChatOpenAI model used for the assessment.
     """
 
     def __init__(self, model_name: str = "gpt-4.1", temperature: float = 0.0):
-        """
-        Initialize the novelty assessor with the specified LLM.
+        """Initializes the NoveltyAssessor.
 
         Args:
-            model_name: Name of the OpenAI model to use
-            temperature: Temperature setting for the LLM
+            model_name: The identifier for the OpenAI model to be used.
+            temperature: The temperature setting for the LLM, controlling the
+                         randomness of the output.
+
+        Raises:
+            ValueError: If the `OPENAI_API_KEY` environment variable is not set.
         """
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
@@ -170,9 +195,23 @@ class NoveltyAssessor:
         )
 
     @staticmethod
-    def get_papers_not_cited(cited_papers, selected_papers, threshold=85):
-        """
-        Returns papers from selected_papers whose titles do not match any title in cited_papers above the threshold.
+    def get_papers_not_cited(cited_papers: List[Dict], selected_papers: List[Dict], threshold: int = 85) -> List[Dict]:
+        """Identifies papers from a selected list that are not in a cited list.
+
+        This function uses fuzzy string matching on paper titles to determine if a
+        paper from `selected_papers` is already present in `cited_papers`.
+
+        Args:
+            cited_papers: A list of dictionaries, each representing a cited paper.
+                          Must contain a "title" key.
+            selected_papers: A list of dictionaries representing papers to check.
+                             Must contain a "title" key.
+            threshold: The similarity score (0-100) from `rapidfuzz` above which
+                       two titles are considered a match.
+
+        Returns:
+            A list of paper dictionaries from `selected_papers` that were not
+            found in `cited_papers`.
         """
         not_cited_papers = []
         for paper in selected_papers:
@@ -188,8 +227,16 @@ class NoveltyAssessor:
         return not_cited_papers
 
     @staticmethod
-    def get_citation_matches(citation_contexts) -> str:
-        """Format citation contexts for analysis."""
+    def get_citation_matches(citation_contexts: Dict[str, List[str]]) -> str:
+        """Formats a dictionary of citation contexts into a readable string for the LLM prompt.
+
+        Args:
+            citation_contexts: A dictionary where keys are paper titles and values
+                               are lists of sentences in which that paper was cited.
+
+        Returns:
+            A formatted string listing each paper and its citation contexts.
+        """
         output_lines = []
         for title, context in citation_contexts.items():
             output_lines.append(f"📄 {title}\n")
@@ -200,15 +247,18 @@ class NoveltyAssessor:
     def load_submission_paper(
         self, data_dir: str, submission_id: str
     ) -> Optional[PaperInformation]:
-        """
-        Load the submission paper information from JSON file.
+        """Loads and parses the structured information for the main submission paper.
 
         Args:
-            data_dir: Directory containing paper information JSON files
-            submission_id: ID of the submission paper
+            data_dir: The base directory where submission data is stored.
+            submission_id: The unique identifier for the submission.
 
         Returns:
-            PaperInformation object for the submission paper
+            A `PaperInformation` object for the submission paper, or None if the
+            file cannot be found or parsed.
+
+        Raises:
+            ValueError: If the structured representation file is not found.
         """
         file_path = os.path.join(
             data_dir, submission_id, f"structured_representation.json"
@@ -234,6 +284,18 @@ class NoveltyAssessor:
         return paper_info
 
     def load_citation_contexts(self, data_dir: str, submission_id: str) -> str:
+        """Loads and formats the citation contexts for related papers.
+
+        This method reads the main submission file and the ranked papers list to
+        find the sentences where each ranked, cited paper was mentioned.
+
+        Args:
+            data_dir: The base directory for submission data.
+            submission_id: The unique identifier for the submission.
+
+        Returns:
+            A formatted string of citation contexts suitable for the LLM prompt.
+        """
         with open(f"{data_dir}/{submission_id}/{submission_id}.json", "r") as f:
             paper_obj = json.load(f)
 
@@ -269,14 +331,16 @@ class NoveltyAssessor:
 
 
     def load_landscape_analysis(self, landscape_file: str) -> str:
-        """
-        Load the research landscape analysis from file.
+        """Loads the content of a research landscape analysis file.
 
         Args:
-            landscape_file: Path to the landscape analysis file
+            landscape_file: The path to the text file containing the analysis.
 
         Returns:
-            Content of the landscape analysis
+            The content of the file as a string.
+
+        Raises:
+            ValueError: If the specified file does not exist.
         """
         if not os.path.exists(landscape_file):
             raise ValueError(f"Landscape analysis file not found: {landscape_file}")
@@ -287,14 +351,13 @@ class NoveltyAssessor:
         return analysis
 
     def format_submission_for_prompt(self, submission: PaperInformation) -> str:
-        """
-        Format the submission paper information for the prompt.
+        """Formats the structured information of the submission paper for the LLM prompt.
 
         Args:
-            submission: PaperInformation object for the submission paper
+            submission: A `PaperInformation` object for the submission paper.
 
         Returns:
-            Formatted string for the prompt
+            A markdown-formatted string summarizing the paper's key aspects.
         """
         formatted_text = f"# SUBMISSION PAPER: {submission.title}\n\n"
 
@@ -336,17 +399,23 @@ class NoveltyAssessor:
         submission: PaperInformation,
         landscape_analysis: str,
         not_cited_paper_titles: str,
-        citation_contexts,
+        citation_contexts: str,
     ) -> str:
-        """
-        Assess the novelty of the submission paper in the context of the research landscape.
+        """Performs the core novelty assessment by querying the LLM.
+
+        This method constructs a detailed prompt containing the submission's
+        structured data, the research landscape, and citation contexts, then
+        invokes the LLM to generate the novelty analysis.
 
         Args:
-            submission: PaperInformation object for the submission paper
-            landscape_analysis: Research landscape analysis
+            submission: The `PaperInformation` object for the submission.
+            landscape_analysis: The text of the research landscape analysis.
+            not_cited_paper_titles: A formatted string of titles of relevant but
+                                    uncited papers.
+            citation_contexts: A formatted string of citation contexts.
 
         Returns:
-            Novelty assessment of the submission paper
+            The novelty assessment text generated by the LLM.
         """
         # Format submission for the prompt
         formatted_submission = self.format_submission_for_prompt(submission)
@@ -363,7 +432,15 @@ class NoveltyAssessor:
 
         return assessment
 
-    def format_not_cited_papers(self, non_cited_papers: list):
+    def format_not_cited_papers(self, non_cited_papers: list) -> str:
+        """Formats a list of uncited paper titles into a simple string list.
+
+        Args:
+            non_cited_papers: A list of paper title strings.
+
+        Returns:
+            A single string with each title prefixed by a hyphen and newline.
+        """
         formatted_text = "\n-".join([i for i in non_cited_papers])
         return formatted_text
 
@@ -372,15 +449,18 @@ class NoveltyAssessor:
         data_dir: str,
         submission_id: str,
     ) -> str:
-        """
-        Run the complete novelty assessment pipeline.
+        """Runs the end-to-end novelty assessment pipeline for a single submission.
+
+        This method orchestrates the loading of all necessary data, calls the
+        assessment logic, saves the output, and updates metadata with cost and
+        token usage statistics.
 
         Args:
-            data_dir: Directory containing paper information JSON files
-            submission_id: ID of the submission paper
+            data_dir: The base directory for all submission data.
+            submission_id: The unique identifier for the submission to be processed.
 
         Returns:
-            Novelty assessment of the submission paper
+            The novelty assessment as a `langchain_core.messages.ai.AIMessage` object.
         """
         # Load submission paper
         submission = self.load_submission_paper(data_dir, submission_id)
@@ -444,19 +524,20 @@ class NoveltyAssessor:
         landscape_file: str = "research_landscape.txt",
         model_name: str = "gpt-4.1",
     ) -> str:
-        """
-        Prepare data for batched inference with OpenAI API for novelty assessment.
+        """Prepares a JSONL file for batch processing with the OpenAI API.
+
+        This method iterates through all submission directories, gathers the
+        necessary inputs (structured representation, landscape analysis, etc.),
+        constructs a prompt for each, and writes them to a JSONL file suitable
+        for the OpenAI batch API.
 
         Args:
-            data_dir: Directory containing paper information JSON files
-            submission_ids: List of submission paper IDs to process
-            landscape_file: Name of the landscape analysis file
-            citation_context_file: Name of the citation context file
-            model_name: Name of the OpenAI model to use
-            non_cited_papers_dict: Dictionary mapping submission IDs to lists of non-cited papers
+            data_dir: The directory containing all submission subdirectories.
+            landscape_file: The filename of the research landscape analysis.
+            model_name: The OpenAI model identifier to be included in the batch request.
 
         Returns:
-            Path to the generated JSONL batch file
+            The path to the generated JSONL batch input file.
         """
         batch_entries = []
 
@@ -571,16 +652,19 @@ class NoveltyAssessor:
         results_file: str,
         output_file: str = "novelty_delta_analysis.txt",
     ) -> Dict:
-        """
-        Process the results from batched inference for novelty assessment.
+        """Processes the output file from an OpenAI batch API job for novelty assessment.
+
+        This method parses the JSONL results file, saves the generated assessment
+        for each submission, calculates costs, updates metadata, and compiles
+        overall statistics for the batch run.
 
         Args:
-            data_dir: Directory to store processed data
-            results_file: Path to the batch results file (JSONL)
-            output_file: Name of the output file for each submission
+            data_dir: The base directory for storing submission data.
+            results_file: The path to the JSONL file containing the batch results.
+            output_file: The name for the output file where the assessment will be saved.
 
         Returns:
-            Dict with processing statistics
+            A dictionary containing detailed statistics about the processed batch.
         """
         from litellm import cost_per_token
 
@@ -714,6 +798,14 @@ class NoveltyAssessor:
 if __name__ == "__main__":
     import argparse
     
+    """The main entry point for the script.
+
+    Provides a command-line interface to run the novelty assessment process.
+    Supports three main modes:
+    1. Processing a single submission.
+    2. Preparing a batch input file for the OpenAI API.
+    3. Processing the results from a completed OpenAI API batch job.
+    """
     parser = argparse.ArgumentParser(description="Assess novelty of research papers")
     parser.add_argument(
         "--data-dir",
