@@ -46,10 +46,12 @@ PRIMARY_PDF_MARKER = ".primary_pdf"
 
 
 def _primary_pdf_marker(submission_dir: Path) -> Path:
+    """Returns the Path to the primary PDF marker file."""
     return submission_dir / PRIMARY_PDF_MARKER
 
 
 def _read_recorded_pdf(submission_dir: Path) -> Optional[Path]:
+    """Reads the primary PDF marker file and returns the path if it exists."""
     marker = _primary_pdf_marker(submission_dir)
     if not marker.exists():
         return None
@@ -68,6 +70,7 @@ def _read_recorded_pdf(submission_dir: Path) -> Optional[Path]:
 
 
 def _write_recorded_pdf(submission_dir: Path, pdf_path: Path) -> None:
+    """Writes the name of the primary PDF to the marker file."""
     marker = _primary_pdf_marker(submission_dir)
     try:
         marker.write_text(pdf_path.name, encoding="utf-8")
@@ -77,7 +80,14 @@ def _write_recorded_pdf(submission_dir: Path, pdf_path: Path) -> None:
 
 @dataclass
 class Step:
-    """Represents a single pipeline stage."""
+    """Represents a single, executable stage in the processing pipeline.
+
+    Attributes:
+        name: The human-readable name of the pipeline step.
+        action: A callable (function or lambda) that executes the step's logic.
+        should_skip: A callable that returns `True` if the step can be skipped,
+                     typically because its output already exists.
+    """
 
     name: str
     action: Callable[[], None]
@@ -85,7 +95,13 @@ class Step:
 
 
 def configure_logging(verbose: bool) -> None:
-    """Configure root logger with consistent formatting."""
+    """Configures the root logger for the application.
+
+    Sets the logging level and format for console output.
+
+    Args:
+        verbose: If `True`, sets the logging level to DEBUG; otherwise, INFO.
+    """
 
     log_level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
@@ -95,7 +111,15 @@ def configure_logging(verbose: bool) -> None:
 
 
 def ensure_submission_workspace(data_dir: Path, submission_id: str) -> Path:
-    """Create submission directory if it does not exist."""
+    """Ensures that the necessary directory for a submission exists.
+
+    Args:
+        data_dir: The base directory for all data.
+        submission_id: The unique identifier for the submission.
+
+    Returns:
+        The `Path` object for the submission's directory.
+    """
 
     submission_dir = data_dir / submission_id
     submission_dir.mkdir(parents=True, exist_ok=True)
@@ -103,7 +127,24 @@ def ensure_submission_workspace(data_dir: Path, submission_id: str) -> Path:
 
 
 def prepare_pdf(submission_dir: Path, submission_id: str, pdf_path: Optional[Path]) -> Path:
-    """Ensure the submission PDF is available under the submission directory."""
+    """Ensures the main submission PDF is present in the workspace.
+
+    If a PDF path is provided, it's copied into the submission directory.
+    If not, the function tries to find an existing PDF based on a marker file
+    or common naming conventions.
+
+    Args:
+        submission_dir: The directory for the submission.
+        submission_id: The unique identifier for the submission.
+        pdf_path: An optional path to the source PDF file.
+
+    Returns:
+        The `Path` to the submission PDF within the workspace.
+
+    Raises:
+        FileNotFoundError: If no PDF is provided and none can be found in the
+                           submission directory.
+    """
 
     if pdf_path is None:
         recorded = _read_recorded_pdf(submission_dir)
@@ -145,7 +186,17 @@ def prepare_pdf(submission_dir: Path, submission_id: str, pdf_path: Optional[Pat
 
 
 def run_grobid(pdf_path: Path, output_path: Path, grobid_url: str, force: bool) -> None:
-    """Submit the PDF to a GROBID instance and persist the TEI XML output."""
+    """Processes a PDF with a GROBID service to generate TEI XML.
+
+    Args:
+        pdf_path: The path to the input PDF file.
+        output_path: The path where the output TEI XML file will be saved.
+        grobid_url: The base URL of the running GROBID service.
+        force: If `True`, re-runs the conversion even if the output file exists.
+
+    Raises:
+        RuntimeError: If the request to the GROBID service fails.
+    """
 
     if output_path.exists() and not force:
         LOGGER.info("Skipping GROBID conversion (output exists) -> %s", output_path)
@@ -169,7 +220,16 @@ def run_grobid(pdf_path: Path, output_path: Path, grobid_url: str, force: bool) 
 
 
 def metadata_needs_update(metadata_path: Path) -> bool:
-    """Return True if metadata extraction should run."""
+    """Checks if the metadata file needs to be (re)generated.
+
+    Returns `True` if the file doesn't exist, is invalid JSON, or lacks a title.
+
+    Args:
+        metadata_path: The path to the submission's metadata JSON file.
+
+    Returns:
+        A boolean indicating whether the metadata extraction step should run.
+    """
 
     if not metadata_path.exists():
         return True
@@ -183,7 +243,17 @@ def metadata_needs_update(metadata_path: Path) -> bool:
 
 
 def needs_semantic_scholar_enrichment(metadata_path: Path) -> bool:
-    """Check whether cited papers already contain Semantic Scholar metadata."""
+    """Checks if the cited papers in the metadata file need S2 enrichment.
+
+    Returns `True` if the metadata file is missing or if none of the cited papers
+    have the `ss_paper_obj` key, which indicates they haven't been enriched.
+
+    Args:
+        metadata_path: The path to the submission's metadata JSON file.
+
+    Returns:
+        A boolean indicating whether the enrichment step should run.
+    """
 
     if not metadata_path.exists():
         return True
@@ -198,22 +268,27 @@ def needs_semantic_scholar_enrichment(metadata_path: Path) -> bool:
 
 
 def has_ranked_papers(results_dir: Path) -> bool:
+    """Checks if the output file for ranked papers exists."""
     return (results_dir / "ranked_papers.json").exists()
 
 
 def has_downloaded_pdfs(pdfs_dir: Path) -> bool:
+    """Checks if any PDFs have been downloaded for related works."""
     return pdfs_dir.exists() and any(pdfs_dir.glob("*.pdf"))
 
 
 def has_ocr_outputs(ocr_dir: Path) -> bool:
+    """Checks if any markdown OCR output files exist."""
     return ocr_dir.exists() and any(ocr_dir.glob("*.md"))
 
 
 def has_introductions(intro_dir: Path, submission_id: str) -> bool:
+    """Checks if the introduction for the main submission has been extracted."""
     return (intro_dir / f"{submission_id}_intro.txt").exists()
 
 
 def has_pipeline_summary(submission_dir: Path) -> bool:
+    """Checks if the final summary file has been generated."""
     return (submission_dir / "summary.txt").exists()
 
 
@@ -230,7 +305,26 @@ def build_steps(
     force: bool,
     ocr_workers: int,
 ) -> list[Step]:
-    """Create the ordered list of pipeline steps."""
+    """Constructs the full list of pipeline steps in execution order.
+
+    Each step is defined with its name, the action to perform, and a function
+    to determine if it should be skipped.
+
+    Args:
+        submission_id: The unique identifier for the submission.
+        submission_dir: The path to the submission's workspace directory.
+        pdf_path: The path to the main submission PDF.
+        data_dir: The base data directory.
+        grobid_url: The URL for the GROBID service.
+        mineru_url: The URL for the MinerU OCR service.
+        pipeline_model: The identifier for the LLM to use in the assessment pipeline.
+        temperature: The temperature setting for LLM calls.
+        force: A boolean to force re-running all steps.
+        ocr_workers: The number of workers for parallel OCR processing.
+
+    Returns:
+        A list of `Step` objects representing the complete pipeline.
+    """
 
     tei_path = submission_dir / f"{submission_id}_fulltext.tei.xml"
     metadata_path = submission_dir / f"{submission_id}.json"
@@ -289,7 +383,17 @@ def build_steps(
 
 
 def run_steps(steps: list[Step]) -> None:
-    """Execute each step sequentially, ignoring skip checks to run full pipeline."""
+    """Executes a list of pipeline steps sequentially.
+
+    This function iterates through the provided steps, checks if a step should
+    be skipped, and runs its action if not.
+
+    Args:
+        steps: A list of `Step` objects to execute.
+
+    Raises:
+        RuntimeError: If any step fails during execution.
+    """
 
     for step in steps:
         # Always run every step - no skipping
@@ -303,6 +407,11 @@ def run_steps(steps: list[Step]) -> None:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for the script.
+
+    Returns:
+        An `argparse.Namespace` object containing the parsed arguments.
+    """
     parser = argparse.ArgumentParser(description="Run the full novelty assessment pipeline")
     parser.add_argument("--data-dir", default="data", help="Base data directory (default: data)")
     parser.add_argument("--submission-id", required=True, help="Identifier for the submission")
@@ -352,6 +461,11 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """The main entry point for the script.
+
+    Parses arguments, sets up the environment, builds the pipeline steps,
+    and runs the full process.
+    """
     args = parse_args()
     configure_logging(args.verbose)
     load_dotenv()

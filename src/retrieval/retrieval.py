@@ -29,10 +29,16 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Try to import RankGPT, fall back to simple ranking if not available
-def setup_rankgpt():
-    """
-    Automatically setup RankGPT by cloning from GitHub if not available locally.
-    Returns the path to RankGPT directory.
+def setup_rankgpt() -> str | None:
+    """Sets up RankGPT by finding an existing installation or cloning it from GitHub.
+
+    This function searches a list of common local paths for a RankGPT repository.
+    If it's not found, it attempts to clone the repository into a user-specific
+    cache directory (`~/.cache/llm_paper_review/RankGPT`).
+
+    Returns:
+        The path to the RankGPT directory as a string if setup is successful,
+        otherwise None.
     """
     import subprocess
     import tempfile
@@ -133,6 +139,21 @@ PURPOSE_PROMPT_POST = [
 
 @dataclass
 class Paper:
+    """Represents a scholarly paper and its metadata.
+
+    Attributes:
+        paper_id: The unique identifier for the paper.
+        title: The title of the paper.
+        abstract: The abstract of the paper.
+        publication_date: The publication date.
+        venue: The publication venue.
+        year: The publication year.
+        citation_count: The number of citations.
+        authors: A string of author names.
+        novel: A field for novelty assessment information.
+        cited_paper: A flag indicating if this is a cited paper.
+        embedding: The numerical embedding of the paper's content.
+    """
     paper_id: str
     title: str = ""
     abstract: str = ""
@@ -148,8 +169,14 @@ class Paper:
     def __repr__(self):
         return f"Date: {self.publication_date}\nPaper ID: {self.paper_id}\nTitle: {self.title}\nPaper Date/Year: {self.publication_date if self.publication_date else (self.year if self.year else '')}"
 
-    def to_dict(self):
-        """Return a dictionary representation of the Paper object excluding the embedding."""
+    def to_dict(self) -> dict:
+        """Returns a dictionary representation of the Paper, excluding the embedding.
+
+        This is useful for serialization, particularly for saving to JSON.
+
+        Returns:
+            A dictionary of the paper's attributes.
+        """
         data = asdict(self)
         data.pop("embedding", None)
         return data
@@ -157,6 +184,20 @@ class Paper:
 
 @dataclass
 class RankingResults:
+    """Holds the complete results of a paper ranking pipeline run.
+
+    Attributes:
+        submission_id: The unique ID for the submission being processed.
+        source_paper: The `Paper` object for the paper being analyzed.
+        cited_papers: A list of `Paper` objects cited by the source paper.
+        query_papers: A list of `Paper` objects retrieved from search queries.
+        final_ranked_papers: The final, combined list of top-ranked papers.
+        all_retrieved_papers: All unique papers considered before the final ranking.
+        queries_used: The list of search queries generated and used.
+        total_cost: The estimated total cost of LLM API calls for the run.
+        general_ranking: The list of papers as ranked by the general relevance model.
+        purpose_ranking: The list of papers as ranked by the purpose-focused model.
+    """
     submission_id: str
     source_paper: Paper
     cited_papers: List[Paper]
@@ -168,8 +209,12 @@ class RankingResults:
     general_ranking: List[Paper]
     purpose_ranking: List[Paper]
 
-    def to_dict(self):
-        """Convert to dictionary for JSON serialization."""
+    def to_dict(self) -> dict:
+        """Converts the RankingResults object to a dictionary for serialization.
+
+        Returns:
+            A dictionary representation of the instance.
+        """
         return {
             "submission_id": self.submission_id,
             "source_paper": self.source_paper.to_dict(),
@@ -185,12 +230,17 @@ class RankingResults:
 
 
 class APIError(Exception):
-    """Custom exception for API-related errors."""
-
+    """Custom exception for handling API-related errors, such as failed requests."""
     pass
 
 
 class PaperRankingSystem:
+    """Orchestrates the entire paper retrieval and ranking pipeline.
+
+    This class integrates various components, including keyword generation,
+    paper fetching from Semantic Scholar, embedding computation, and multi-stage
+    re-ranking using both similarity and LLM-based methods (RankGPT).
+    """
     def __init__(
         self,
         keyword_model: str = "gpt-4o",
@@ -199,15 +249,15 @@ class PaperRankingSystem:
         results_dir: str = "results",
         log_dir: str = "logs",
     ):
-        """
-        Initialize the paper ranking system.
+        """Initializes the PaperRankingSystem.
 
         Args:
-            keyword_model: Model for keyword generation
-            ranking_model: Model for RankGPT ranking
-            embedding_model: Model for computing embeddings
-            results_dir: Directory to save results
-            log_dir: Directory to save log files
+            keyword_model: The identifier for the LLM used for keyword generation.
+            ranking_model: The identifier for the LLM used for RankGPT re-ranking.
+            embedding_model: The identifier for the sentence-transformer model used
+                             for generating embeddings.
+            results_dir: The directory where result files will be saved.
+            log_dir: The directory where log files will be saved.
         """
         self.base_url = "https://api.semanticscholar.org/graph/v1/paper"
         self.results_dir = Path(results_dir)
@@ -239,7 +289,7 @@ class PaperRankingSystem:
         self.logger.info("PaperRankingSystem initialized successfully")
 
     def _setup_logging(self):
-        """Setup logging configuration for both file and console output."""
+        """Sets up a logger with both file and console handlers."""
         # Create logger
         self.logger = logging.getLogger("PaperRankingSystem")
         self.logger.setLevel(logging.INFO)
@@ -275,7 +325,22 @@ class PaperRankingSystem:
     def _make_request_with_retry(
         self, url: str, headers: Dict = None, max_retries: int = 3
     ) -> Dict:
-        """Make HTTP request with exponential backoff retry logic."""
+        """Makes an HTTP GET request with automatic retries on failure.
+
+        This method implements an exponential backoff strategy to handle transient
+        network issues and API rate limiting (HTTP 429).
+
+        Args:
+            url: The URL to make the request to.
+            headers: Optional dictionary of HTTP headers to include.
+            max_retries: The maximum number of times to retry the request.
+
+        Returns:
+            The JSON response as a dictionary if successful.
+
+        Raises:
+            APIError: If the request fails after all retry attempts.
+        """
         self.logger.debug(f"Making request to: {url}")
 
         for attempt in range(max_retries):
@@ -321,7 +386,16 @@ class PaperRankingSystem:
         return {}
 
     def generate_search_queries(self, source_paper: Paper) -> Tuple[List[str], float]:
-        """Generate search queries based on the source paper's content."""
+        """Generates search queries using an LLM based on a paper's title and abstract.
+
+        Args:
+            source_paper: The `Paper` object to generate queries for.
+
+        Returns:
+            A tuple containing:
+            - A list of generated keyword strings.
+            - The estimated cost of the LLM call as a float.
+        """
         self.logger.info(f"Generating search queries for paper: {source_paper.title}")
 
         prompt = """Your task is to extract keywords about the IDEA of the paper from the provided abstract that can be queried on a search engine like semantic scholar for finding similar research papers, which match in main purpose of the idea.
@@ -389,7 +463,17 @@ class PaperRankingSystem:
         max_papers_per_query: int = 20,
         year: Optional[int] = None,
     ) -> List[Paper]:
-        """Fetch papers from Semantic Scholar with retry logic."""
+        """Fetches papers from the Semantic Scholar API for a list of queries.
+
+        Args:
+            queries: A list of search query strings.
+            max_papers_per_query: The maximum number of papers to retrieve for each query.
+            year: An optional year to filter results, retrieving papers published
+                  in or before this year.
+
+        Returns:
+            A list of `Paper` objects retrieved from the API.
+        """
         self.logger.info(
             f"Fetching papers from Semantic Scholar for {len(queries)} queries"
         )
@@ -442,7 +526,20 @@ class PaperRankingSystem:
     def merge_paper_collections(
         self, cited_papers: List[Paper], query_papers: List[Paper], source_paper: Paper
     ) -> List[Paper]:
-        """Merge papers from citations and query results, removing duplicates and invalid papers."""
+        """Merges and de-duplicates lists of cited and query-retrieved papers.
+
+        This function combines two lists of papers, ensuring uniqueness based on
+        paper ID. It also filters out papers that are not valid for comparison,
+        such as those published after the source paper or with highly similar titles.
+
+        Args:
+            cited_papers: A list of `Paper` objects from the source paper's bibliography.
+            query_papers: A list of `Paper` objects from Semantic Scholar search results.
+            source_paper: The source `Paper` object used for validation checks.
+
+        Returns:
+            A single de-duplicated list of `Paper` objects.
+        """
         unique_papers = {}
 
         def is_valid_paper(paper: Paper, source_paper: Paper) -> bool:
@@ -519,7 +616,15 @@ class PaperRankingSystem:
         return list(unique_papers.values())
 
     def compute_embeddings_batch(self, texts: List[str]) -> List[np.ndarray]:
-        """Compute embeddings for multiple texts in batch for efficiency."""
+        """Computes sentence embeddings for a batch of texts.
+
+        Args:
+            texts: A list of strings to be embedded.
+
+        Returns:
+            A list of NumPy arrays, where each array is the embedding for the
+            corresponding text.
+        """
         if not texts:
             return []
 
@@ -558,7 +663,15 @@ class PaperRankingSystem:
     def compute_similarity_scores(
         self, source_embedding: np.ndarray, paper_embeddings: List[np.ndarray]
     ) -> List[float]:
-        """Compute cosine similarity between source paper and retrieved papers."""
+        """Calculates the cosine similarity between a source embedding and a list of others.
+
+        Args:
+            source_embedding: The embedding of the source paper.
+            paper_embeddings: A list of embeddings for the papers to be compared.
+
+        Returns:
+            A list of float similarity scores, one for each paper embedding.
+        """
         if source_embedding is None or len(paper_embeddings) == 0:
             return []
 
@@ -570,7 +683,16 @@ class PaperRankingSystem:
     def filter_top_n_papers(
         self, papers: List[Paper], similarity_scores: List[float], n: int = 100
     ) -> List[Paper]:
-        """Filter the top N papers based on embedding similarity scores."""
+        """Filters a list of papers to keep the top N based on similarity scores.
+
+        Args:
+            papers: The list of `Paper` objects to filter.
+            similarity_scores: A parallel list of similarity scores.
+            n: The number of top papers to return.
+
+        Returns:
+            A new list containing the top N `Paper` objects.
+        """
         if not papers or not similarity_scores:
             return []
 
@@ -581,7 +703,22 @@ class PaperRankingSystem:
     def rankgpt_rerank(
         self, source_paper: Paper, papers: List[Paper], ranking_type: str = "general"
     ) -> Tuple[List[Paper], float]:
-        """Re-rank papers using RankGPT with error handling."""
+        """Re-ranks a list of papers using the RankGPT algorithm.
+
+        This method can perform two types of ranking: "general" relevance or
+        "purpose-focused" relevance. It constructs a prompt for an LLM, sends
+        it, and parses the permutation from the response to re-order the papers.
+
+        Args:
+            source_paper: The source `Paper` for context.
+            papers: The list of `Paper` objects to be re-ranked.
+            ranking_type: The type of ranking to perform ('general' or 'purpose').
+
+        Returns:
+            A tuple containing:
+            - The re-ranked list of `Paper` objects.
+            - The estimated cost of the LLM call.
+        """
         if not papers:
             return [], 0.0
 
@@ -685,7 +822,20 @@ class PaperRankingSystem:
     def combine_rankings(
         self, general_ranked: List[Paper], purpose_ranked: List[Paper], k: int = 10
     ) -> List[Paper]:
-        """Combine the top-k papers from both rankings."""
+        """Combines the top-k results from two different ranked lists.
+
+        This method takes the top `k` papers from the general ranking and the
+        top `k` from the purpose-focused ranking and merges them into a single,
+        de-duplicated list.
+
+        Args:
+            general_ranked: A list of papers sorted by general relevance.
+            purpose_ranked: A list of papers sorted by purpose-focused relevance.
+            k: The number of papers to take from the top of each list.
+
+        Returns:
+            A combined list of the top papers.
+        """
         unique_papers = {}
 
         # Add top-k papers from general ranking
@@ -700,7 +850,14 @@ class PaperRankingSystem:
         return list(unique_papers.values())
 
     def save_results(self, results: RankingResults) -> None:
-        """Save results directly to results_dir."""
+        """Saves the complete ranking results to multiple JSON files.
+
+        This method saves the final ranked list, a list of all retrieved papers,
+        and a metadata file summarizing the run.
+
+        Args:
+            results: The `RankingResults` object to save.
+        """
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
         self.logger.info(f"Saving results to {self.results_dir}")
@@ -742,7 +899,14 @@ class PaperRankingSystem:
             raise
 
     def count_cited_papers(self, papers: List[Paper]) -> Tuple[int, int]:
-        """Count cited vs non-cited papers in a list."""
+        """Counts the number of cited vs. non-cited papers in a list.
+
+        Args:
+            papers: A list of `Paper` objects.
+
+        Returns:
+            A tuple containing (number_of_cited_papers, number_of_non_cited_papers).
+        """
         cited_count = sum(1 for p in papers if getattr(p, "cited_paper", False))
         non_cited_count = len(papers) - cited_count
         return cited_count, non_cited_count
@@ -756,19 +920,24 @@ class PaperRankingSystem:
         top_n_similarity: int = 100,
         combination_k: int = 10,
     ) -> RankingResults:
-        """
-        Main pipeline to find papers similar to the source paper.
+        """Executes the full paper retrieval and ranking pipeline.
+
+        This is the main entry point method that orchestrates the entire process,
+        from generating queries to fetching, filtering, ranking, and saving results.
 
         Args:
-            source_paper: Paper object containing the paper to compare against
-            cited_papers: List of papers cited by the source paper
-            submission_id: Unique identifier for this submission
-            max_papers_per_query: Maximum papers to retrieve per search query
-            top_n_similarity: Number of papers to keep after similarity filtering
-            combination_k: Number of top papers to take from each ranking
+            source_paper: The `Paper` object for the paper to be analyzed.
+            cited_papers: A list of `Paper` objects cited by the source paper.
+            submission_id: A unique identifier for this processing run.
+            max_papers_per_query: The max number of papers to fetch for each query.
+            top_n_similarity: The number of papers to select after the initial
+                              similarity-based filtering.
+            combination_k: The number of papers to take from the top of each
+                           re-ranking list for the final result.
 
         Returns:
-            RankingResults object containing all results and metadata
+            A `RankingResults` object containing all the results and metadata from
+            the pipeline run.
         """
         self.logger.info(f"Starting pipeline for submission: {submission_id}")
         self.logger.info(f"Source paper: {source_paper.title}")
@@ -901,15 +1070,21 @@ class PaperRankingSystem:
 
 
 def process_for_pipeline(data_dir: str, submission_id: str) -> bool:
-    """
-    Process a single submission for pipeline integration.
-    
+    """Processes a single submission as part of the larger data pipeline.
+
+    This function acts as a bridge, loading data for a specific submission,
+    initializing the `PaperRankingSystem`, and running the main
+    `find_similar_papers` method.
+
     Args:
-        data_dir: Base data directory for pipeline
-        submission_id: ID of the submission
-    
+        data_dir: The base directory for all pipeline data.
+        submission_id: The unique identifier for the submission to process.
+
     Returns:
-        Success status
+        `True` if the pipeline runs successfully, `False` otherwise.
+
+    Raises:
+        FileNotFoundError: If the submission's input JSON file is not found.
     """
     # Load submission data
     input_file = Path(data_dir) / submission_id / f"{submission_id}.json"
@@ -977,6 +1152,11 @@ def process_for_pipeline(data_dir: str, submission_id: str) -> bool:
 
 
 def main():
+    """The main entry point for the script.
+
+    Parses command-line arguments and initiates the retrieval and ranking
+    process for a single submission.
+    """
     parser = argparse.ArgumentParser(description="Paper retrieval and ranking system - single submission mode only")
     parser.add_argument(
         "--data-dir",

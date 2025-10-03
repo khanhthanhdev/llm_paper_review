@@ -31,6 +31,7 @@ PIPELINE_MODEL = os.getenv("PIPELINE_MODEL", "gpt-4o")
 
 
 def _safe_int(value: Optional[str], default: int) -> int:
+    """Safely convert a string to an integer, falling back to a default."""
     try:
         return int(value) if value is not None else default
     except (TypeError, ValueError):
@@ -38,6 +39,7 @@ def _safe_int(value: Optional[str], default: int) -> int:
 
 
 def _safe_float(value: Optional[str], default: float) -> float:
+    """Safely convert a string to a float, falling back to a default."""
     try:
         return float(value) if value is not None else default
     except (TypeError, ValueError):
@@ -51,7 +53,15 @@ DATA_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 def discover_runs(data_root: Path) -> list[dict[str, object]]:
-    """Return known submission directories sorted by recency."""
+    """Scans the data directory to find previous pipeline runs.
+
+    Args:
+        data_root: The root directory where submission data is stored.
+
+    Returns:
+        A list of dictionaries, each representing a run, sorted by modification
+        time in descending order.
+    """
 
     if not data_root.exists():
         return []
@@ -76,7 +86,17 @@ def discover_runs(data_root: Path) -> list[dict[str, object]]:
 
 
 def read_text_file(path: Path) -> Optional[str]:
-    """Return file contents as UTF-8 text if available."""
+    """Reads a file and returns its content as a string.
+
+    Returns None if the file does not exist. Handles potential decoding errors
+    by replacing problematic characters.
+
+    Args:
+        path: The `Path` object of the file to read.
+
+    Returns:
+        The file's content as a string, or None if the file doesn't exist.
+    """
 
     if not path.exists():
         return None
@@ -88,7 +108,14 @@ def read_text_file(path: Path) -> Optional[str]:
 
 
 def render_copy_button(text: str, *, key: str, label: str = "Copy to clipboard") -> None:
-    """Render a lightweight copy-to-clipboard button for a block of text."""
+    """Renders a button that copies the given text to the clipboard using JavaScript.
+
+    Args:
+        text: The text to be copied when the button is clicked.
+        key: A unique key for the component (required by Streamlit's rendering logic,
+             though not directly used by `st.html` before version 1.38).
+        label: The text label to display on the button.
+    """
 
     _ = key  # Preserve parameter for call sites; Streamlit html() lacks a key arg pre-1.38.
     escaped = json.dumps(text)
@@ -118,15 +145,30 @@ if TYPE_CHECKING:  # pragma: no cover - import only when type checking
 
 
 class StreamlitLogHandler(logging.Handler):
-    """Streamlit-aware log handler that mirrors log lines into the UI."""
+    """A custom logging handler that writes log records to a Streamlit container.
+
+    This allows the application to display a running log of the pipeline's
+    progress directly in the user interface.
+
+    Attributes:
+        placeholder: The Streamlit container (e.g., `st.empty()`) to write logs into.
+        max_lines: The maximum number of log lines to retain and display.
+    """
 
     def __init__(self, placeholder: "st.delta_generator.DeltaGenerator", *, max_lines: int = 200) -> None:
+        """Initializes the log handler.
+
+        Args:
+            placeholder: The Streamlit container to which log messages will be written.
+            max_lines: The maximum number of lines to keep in the log display.
+        """
         super().__init__(level=logging.INFO)
         self.placeholder = placeholder
         self.max_lines = max_lines
         self._lines: list[str] = []
 
-    def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover - UI side effects only
+    def emit(self, record: logging.LogRecord) -> None:
+        """Formats and displays a log record in the Streamlit UI."""
         message = self.format(record)
         self._lines.append(message)
         if len(self._lines) > self.max_lines:
@@ -136,6 +178,7 @@ class StreamlitLogHandler(logging.Handler):
 
 
 def _create_run_log_path(submission_dir: Path, submission_id: str) -> Path:
+    """Creates a timestamped log file path for a pipeline run."""
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     log_dir = submission_dir / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -144,7 +187,18 @@ def _create_run_log_path(submission_dir: Path, submission_id: str) -> Path:
 
 @contextmanager
 def _attach_run_loggers(log_path: Path, ui_placeholder: "st.delta_generator.DeltaGenerator") -> Iterator[None]:
-    """Attach file + UI log handlers for the duration of a run."""
+    """A context manager to temporarily attach log handlers for a pipeline run.
+
+    This sets up logging to both a file and the Streamlit UI and ensures the
+    handlers are removed and cleaned up afterward.
+
+    Args:
+        log_path: The path to the file where logs should be saved.
+        ui_placeholder: The Streamlit container for displaying logs in the UI.
+
+    Yields:
+        None.
+    """
 
     root_logger = logging.getLogger()
     original_level = root_logger.level
@@ -172,7 +226,16 @@ def _attach_run_loggers(log_path: Path, ui_placeholder: "st.delta_generator.Delt
 
 
 def save_uploaded_pdf(uploaded_file: "UploadedFile", submission_dir: Path, submission_id: str) -> Path:
-    """Persist the uploaded PDF to the submission workspace."""
+    """Saves a PDF uploaded via Streamlit to the submission's workspace directory.
+
+    Args:
+        uploaded_file: The file object from `st.file_uploader`.
+        submission_dir: The directory for the submission.
+        submission_id: The unique identifier for the submission.
+
+    Returns:
+        The `Path` where the PDF was saved.
+    """
 
     suffix = Path(uploaded_file.name or "").suffix.lower()
     if suffix != ".pdf":
@@ -190,7 +253,23 @@ def run_pipeline_with_progress(
     pdf_path: Path,
     reuse_cached: bool,
 ) -> Iterator[tuple[str, str]]:
-    """Yield progress updates while executing the pipeline."""
+    """Runs the full pipeline and yields progress updates for the UI.
+
+    This generator function executes each step of the pipeline and yields its
+    status ('skipped', 'running', 'completed') and name, allowing the Streamlit
+    UI to update in real time.
+
+    Args:
+        submission_id: The unique identifier for the submission.
+        submission_dir: The path to the submission's workspace directory.
+        pdf_path: The path to the main submission PDF.
+        reuse_cached: If `True`, cached results will be used, and completed
+                      steps will be skipped.
+
+    Yields:
+        A tuple containing the status and name of each pipeline step as it
+        is processed.
+    """
 
     force = not reuse_cached
     LOGGER.info("Starting pipeline build for submission '%s'", submission_id)
@@ -223,7 +302,17 @@ def run_pipeline_with_progress(
 
 
 def render_text_output(*, title: str, file_path: Path, submission_id: str) -> None:
-    """Display a text artifact with download and copy helpers."""
+    """Renders a text artifact in the Streamlit UI.
+
+    This function displays the content of a text file and provides buttons for
+    downloading the file and copying its content to the clipboard.
+
+    Args:
+        title: The title to display for this output section.
+        file_path: The path to the text file to be rendered.
+        submission_id: The ID of the current submission, used for unique keys
+                       and filenames.
+    """
 
     content = read_text_file(file_path)
     if content is None:
@@ -253,7 +342,15 @@ def render_text_output(*, title: str, file_path: Path, submission_id: str) -> No
 
 
 def render_rankings_panel(submission_dir: Path, submission_id: str) -> None:
-    """Display the ranked papers table with download/export helpers."""
+    """Renders the panel displaying the ranked list of related papers.
+
+    This function reads the `ranked_papers.json` file, displays the results in
+    a Streamlit dataframe, and provides buttons to download the data as JSON or CSV.
+
+    Args:
+        submission_dir: The directory for the submission being displayed.
+        submission_id: The unique identifier for the submission.
+    """
 
     ranked_path = submission_dir / "related_work_data" / "ranked_papers.json"
     if not ranked_path.exists():
@@ -328,6 +425,12 @@ def render_rankings_panel(submission_dir: Path, submission_id: str) -> None:
 
 
 def main() -> None:
+    """The main function that defines and runs the Streamlit application.
+
+    This function sets up the page configuration, manages session state, lays out
+    all the UI components (sidebar, tabs, buttons), and handles the logic for
+    running the pipeline and displaying results.
+    """
     st.set_page_config(page_title="LLM Paper Review", layout="wide")
 
     if "submission_id_input" not in st.session_state:

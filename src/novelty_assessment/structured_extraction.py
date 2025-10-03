@@ -14,14 +14,33 @@ load_dotenv()
 
 # Define models for structured data
 class ResultEntry(BaseModel):
-    """Individual result entries for structured paper information."""
+    """Represents a single key quantitative result from a paper.
+
+    Attributes:
+        metric: The name of the evaluation metric (e.g., "Accuracy", "F1-Score").
+        value: The reported value for the metric, stored as a string.
+    """
 
     metric: str = Field(description="Name of the evaluation metric")
     value: str = Field(description="Value of the metric")
 
 
 class StructuredPaperInformation(BaseModel):
-    """Structured information extracted from a research paper."""
+    """A Pydantic model defining the schema for structured data from a paper.
+
+    This model ensures that the information extracted by the LLM is consistent
+    and adheres to a predefined format, making it reliable for downstream
+    analysis tasks.
+
+    Attributes:
+        methods: A list of methods or approaches proposed in the paper.
+        problems: A list of problems or tasks the paper addresses.
+        datasets: A list of datasets used for evaluation.
+        metrics: A list of evaluation metrics used to measure performance.
+        results: A list of key quantitative results, captured as `ResultEntry` objects.
+        novelty_claims: A list of explicit claims the authors make about the
+                        novelty of their work.
+    """
 
     methods: List[str] = Field(
         description="List of methods/approaches proposed in the paper"
@@ -38,17 +57,28 @@ class StructuredPaperInformation(BaseModel):
 
 
 class StructuredRepresentationGenerator:
-    """
-    Generates structured representations of research papers.
+    """Extracts structured information from research papers using an LLM.
+
+    This class provides methods to process individual papers or entire submissions,
+    extracting key information like methods, problems, datasets, and novelty claims
+    based on a paper's title, abstract, and introduction. It supports both
+    real-time processing and batch inference preparation.
+
+    Attributes:
+        llm: An instance of a LangChain ChatOpenAI model.
+        template (str): The prompt template used for the extraction task.
     """
 
     def __init__(self, model_name: str = "gpt-4.1", temperature: float = 0.0):
-        """
-        Initialize the generator with the specified LLM.
+        """Initializes the StructuredRepresentationGenerator.
 
         Args:
-            model_name: Name of the OpenAI model to use
-            temperature: Temperature setting for the LLM
+            model_name: The identifier for the OpenAI model to be used.
+            temperature: The temperature setting for the LLM, controlling output
+                         randomness.
+
+        Raises:
+            ValueError: If the `OPENAI_API_KEY` environment variable is not set.
         """
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
@@ -82,17 +112,21 @@ class StructuredRepresentationGenerator:
 
     def extract_paper_information(
         self, paper_title: str, abstract: str, introduction: str = ""
-    ):
-        """
-        Extract structured information from a research paper.
+    ) -> Dict[str, Any]:
+        """Extracts structured information from the text of a single research paper.
+
+        This method uses a predefined prompt and the initialized LLM to parse the
+        paper's title, abstract, and introduction into the `StructuredPaperInformation`
+        schema.
 
         Args:
-            paper_title: The title of the paper
-            abstract: The abstract content of the paper
-            introduction: The introduction of the paper (optional)
+            paper_title: The title of the paper.
+            abstract: The abstract of the paper.
+            introduction: The introduction of the paper (optional but recommended).
 
         Returns:
-            Dict containing both raw LLM response and parsed structured information
+            A dictionary containing the raw string response from the LLM and the
+            parsed Pydantic object as a dictionary.
         """
         prompt = self.template.format(
             title=paper_title, abstract=abstract, introduction=introduction
@@ -106,16 +140,21 @@ class StructuredRepresentationGenerator:
         # Return clean format
         return {"raw": str(result), "parsed": dict(result)}
 
-    def process_single_submission(self, data_dir: str, submission_id: str):
-        """
-        Process a single submission using LangChain batch for related papers.
+    def process_single_submission(self, data_dir: str, submission_id: str) -> Dict[str, Any]:
+        """Processes a single submission, including its main paper and related works.
+
+        This method orchestrates the structured extraction for an entire submission
+        package. It processes the main paper individually and then uses the
+        efficient `batch` method from LangChain to process the top 10 related
+        papers concurrently. The results are saved to a JSON file.
 
         Args:
-            data_dir: Directory containing submission data
-            submission_id: ID of the submission to process
+            data_dir: The base directory where submission data is stored.
+            submission_id: The unique identifier for the submission to process.
 
         Returns:
-            Dict with structured representations
+            A dictionary containing the structured representations for the main
+            paper and its selected related papers.
         """
         submission_path = os.path.join(data_dir, submission_id)
 
@@ -226,17 +265,21 @@ class StructuredRepresentationGenerator:
         data_dir: str,
         model_name: str = "gpt-4.1",
         output_dir: str = "./openai_inputs",
-    ):
-        """
-        Prepare data for batched inference with OpenAI API.
+    ) -> str:
+        """Prepares a JSONL file for batch processing with the OpenAI API.
+
+        This method iterates through all submission directories, constructs a
+        prompt for the main paper and each of its related papers, and formats
+        them into a JSONL file suitable for the OpenAI batch API endpoint. This
+        is highly efficient for processing a large number of papers.
 
         Args:
-            data_dir: Directory containing submission data
-            model_name: Name of the OpenAI model to use
-            output_dir: Directory to save the batch input file
+            data_dir: The directory containing all submission subdirectories.
+            model_name: The OpenAI model identifier to be included in the batch request.
+            output_dir: The directory where the generated batch file will be saved.
 
         Returns:
-            Path to the generated JSONL batch file
+            The path to the generated JSONL file.
         """
         batch_entries = []
 
@@ -384,16 +427,21 @@ class StructuredRepresentationGenerator:
         self,
         results_file: str,
         data_dir: str,
-    ):
-        """
-        Process the results from batched inference and organize by submission.
+    ) -> Dict[str, Any]:
+        """Processes the output from an OpenAI batch API job for structured extraction.
+
+        This method reads the JSONL results file, groups the extracted information
+        by submission ID, and saves the complete structured representation for each
+        submission to a JSON file. It also compiles and returns statistics about
+        the batch job.
 
         Args:
-            results_file: Path to the batch results file (JSONL)
-            data_dir: Directory to store processed data
+            results_file: The path to the JSONL file containing the batch API results.
+            data_dir: The base directory where the output for each submission
+                      will be stored.
 
         Returns:
-            Dict with processing statistics
+            A dictionary containing detailed statistics about the processed batch.
         """
         from litellm import cost_per_token
 
@@ -557,6 +605,13 @@ class StructuredRepresentationGenerator:
 
 if __name__ == "__main__":
     import argparse
+    """The main entry point for the script.
+
+    Provides a command-line interface for structured data extraction. It supports
+    two main operations:
+    1. `--prepare`: Generates a JSONL file for batch processing with the OpenAI API.
+    2. `--process`: Processes the results from a completed OpenAI batch job.
+    """
 
     parser = argparse.ArgumentParser(
         description="Generate structured representations of papers"

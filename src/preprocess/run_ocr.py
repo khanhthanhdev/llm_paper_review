@@ -30,9 +30,27 @@ PRIMARY_PDF_MARKER = ".primary_pdf"
 
 
 class MinerUOCRClient:
-    """Client for interacting with MinerU FastAPI server."""
+    """A client for processing PDFs through a MinerU FastAPI server.
+
+    This client handles the communication with a running MinerU instance,
+    including connecting, sending PDFs for processing, and handling retries.
+
+    Attributes:
+        base_url: The base URL of the MinerU server.
+        timeout: The request timeout in seconds.
+        session: A `requests.Session` object for making HTTP requests.
+    """
     
     def __init__(self, base_url: str = "http://localhost:8000", timeout: int = 3600):
+        """Initializes the MinerUOCRClient.
+
+        Args:
+            base_url: The base URL of the MinerU server.
+            timeout: The default timeout for requests in seconds.
+
+        Raises:
+            requests.exceptions.RequestException: If the client cannot connect to the server.
+        """
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session = requests.Session()
@@ -49,16 +67,19 @@ class MinerUOCRClient:
             raise
     
     def process_pdf(self, pdf_path: Path, page_range: str = "full", max_retries: int = 2) -> Optional[str]:
-        """
-        Process a PDF through the MinerU server.
-        
+        """Sends a PDF to the MinerU server for OCR processing.
+
+        This method handles file upload, request sending, and response parsing.
+        It includes a retry mechanism to handle transient network or server errors.
+
         Args:
-            pdf_path: Path to the PDF file
-            page_range: Pages to process (MinerU processes full document)
-            max_retries: Maximum number of retry attempts
-            
+            pdf_path: The path to the PDF file to be processed.
+            page_range: The range of pages to process. Note: MinerU typically
+                        processes the full document regardless of this parameter.
+            max_retries: The maximum number of times to retry the request upon failure.
+
         Returns:
-            str: OCR result text or None if failed
+            The extracted text content as a string if successful, otherwise None.
         """
         if not pdf_path.exists():
             logger.error(f"PDF file not found: {pdf_path}")
@@ -111,14 +132,16 @@ class MinerUOCRClient:
         return None  # All retries exhausted
     
     def _extract_text_from_results(self, results: dict) -> Optional[str]:
-        """
-        Extract text content from MinerU results structure.
-        
+        """Extracts text content from the structured MinerU JSON response.
+
+        MinerU's response format can vary, so this method attempts to find the
+        markdown content in common locations within the JSON structure.
+
         Args:
-            results: Results dictionary from MinerU response
-            
+            results: The dictionary parsed from the MinerU server's JSON response.
+
         Returns:
-            str: Concatenated markdown content or None
+            The extracted markdown content as a string, or None if not found.
         """
         try:
             # MinerU returns results as a dictionary with paper filenames as keys
@@ -146,7 +169,20 @@ class MinerUOCRClient:
 
 
 def find_main_paper_pdf(submission_dir: Path, submission_id: str) -> Optional[Path]:
-    """Find the main paper PDF file."""
+    """Finds the main submission PDF within a directory.
+
+    It uses a series of heuristics to locate the primary PDF:
+    1. Checks for a `.primary_pdf` marker file containing the filename.
+    2. Looks for common filenames like `{submission_id}.pdf` or `paper.pdf`.
+    3. If only one PDF exists in the directory, assumes it is the main paper.
+
+    Args:
+        submission_dir: The directory where the submission files are located.
+        submission_id: The unique identifier for the submission.
+
+    Returns:
+        A `Path` object pointing to the main PDF, or None if it cannot be found.
+    """
     marker = submission_dir / PRIMARY_PDF_MARKER
     if marker.exists():
         try:
@@ -182,17 +218,19 @@ def find_main_paper_pdf(submission_dir: Path, submission_id: str) -> Optional[Pa
 
 
 def process_single_pdf(ocr_client: MinerUOCRClient, pdf_path: Path, output_dir: Path, paper_id: str) -> Tuple[str, bool]:
-    """
-    Process a single PDF file.
-    
+    """Processes a single PDF file using the OCR client and saves the result.
+
+    This function coordinates the OCR processing for one PDF, including checking
+    for existing output and saving the new result to a file.
+
     Args:
-        ocr_client: OCR client instance
-        pdf_path: Path to PDF file
-        output_dir: Directory to save OCR output
-        paper_id: ID for the paper
-        
+        ocr_client: An initialized `MinerUOCRClient` instance.
+        pdf_path: The path to the PDF file to process.
+        output_dir: The directory where the output markdown file should be saved.
+        paper_id: The unique identifier for the paper, used for naming the output file.
+
     Returns:
-        Tuple of (paper_id, success_status)
+        A tuple containing the paper ID and a boolean indicating success.
     """
     ocr_file = output_dir / f"{paper_id}.md"
     
@@ -213,17 +251,20 @@ def process_single_pdf(ocr_client: MinerUOCRClient, pdf_path: Path, output_dir: 
 
 
 def process_for_pipeline(data_dir: str, submission_id: str, server_url: str = "http://localhost:8000", max_workers: int = 3) -> bool:
-    """
-    Process OCR for a single submission with concurrent processing.
-    
+    """Orchestrates OCR processing for a full submission package.
+
+    This function finds the main paper and all related papers, then processes
+    them concurrently using a thread pool. It manages the entire OCR workflow
+    for a single submission as part of the wider pipeline.
+
     Args:
-        data_dir: Base data directory
-        submission_id: ID of the submission
-        server_url: DotsOCR server URL
-        max_workers: Maximum number of concurrent OCR requests
-        
+        data_dir: The base directory for all submission data.
+        submission_id: The unique identifier for the submission to process.
+        server_url: The URL of the MinerU OCR server.
+        max_workers: The number of parallel threads to use for processing PDFs.
+
     Returns:
-        bool: Success status
+        `True` if at least one PDF was processed successfully, otherwise `False`.
     """
     submission_dir = Path(data_dir) / submission_id
     ocr_dir = submission_dir / "ocr"
@@ -307,6 +348,11 @@ def process_for_pipeline(data_dir: str, submission_id: str, server_url: str = "h
 
 
 if __name__ == "__main__":
+    """The main entry point for the script.
+
+    Parses command-line arguments and initiates the OCR processing for a specified
+    submission. This allows the script to be run directly from the command line.
+    """
     parser = argparse.ArgumentParser(description="Process PDFs through MinerU FastAPI server - single submission mode only")
     parser.add_argument(
         "--data-dir",
